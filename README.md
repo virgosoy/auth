@@ -71,3 +71,7 @@ pnpm preview
 ```
 
 Checkout the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## 依赖说明
+
+开发依赖的 @nuxt/examples-ui 是 playground 依赖的，实际并不需要。
