@@ -1,4 +1,10 @@
 import { randomUUID } from 'uncrypto';
+// @ts-ignore: js 是正常的，ts 不正常，相关见：https://nitro.unjs.io/guide/auto-imports#manual-imports
+import { useStorage as _useStorage } from '#imports';
+import type { Storage, StorageValue } from 'unstorage'
+
+/** 重写 useStorage 给予默认 key */
+const useStorage = <T extends StorageValue>(): Storage<T> => _useStorage<T>('.data:auth')
 
 export interface User {
   id: string;
