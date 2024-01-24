@@ -1,12 +1,13 @@
 import type { H3Event, SessionConfig } from "h3";
 import crypto from "uncrypto";
+import type { User } from "./db";
 
 const sessionConfig: SessionConfig = useRuntimeConfig().auth || {};
 
 export type AuthSession = {
-  id: string;
-  name: string;
-  email: string;
+  id: User["id"];
+  name: User["name"];
+  account: User["account"];
 };
 
 export const useAuthSession = async (event: H3Event) => {
@@ -16,7 +17,7 @@ export const useAuthSession = async (event: H3Event) => {
 
 export const requireAuthSession = async (event: H3Event) => {
   const session = await useAuthSession(event);
-    if (!session.data.email) {
+    if (!session.data.account) {
       throw createError({
         message: "Not Authorized",
         statusCode: 401,

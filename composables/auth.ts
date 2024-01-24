@@ -1,11 +1,11 @@
 export const useAuth = () => useNuxtApp().$auth
 
-export const authLogin = async (email: string, password: string) => {
+export const authLogin = async (account: string, password: string) => {
   await $fetch("/api/auth/login", {
     method: "POST",
     body: {
-      email: email,
-      password: password,
+      account,
+      password,
     },
   });
   useAuth().redirectTo.value = null;
@@ -13,15 +13,15 @@ export const authLogin = async (email: string, password: string) => {
   await navigateTo(useAuth().redirectTo.value || "/");
 };
 
-export const authRegister = async (email: string, password: string) => {
+export const authRegister = async (account: string, password: string) => {
   await $fetch("/api/auth/register", {
     method: "POST",
     body: {
-      email: email,
-      password: password,
+      account,
+      password,
     },
   });
-  return await authLogin(email, password);
+  return await authLogin(account, password);
 };
 
 export const authLogout = async () => {

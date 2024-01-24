@@ -1,8 +1,8 @@
 export default eventHandler(async (event) => {
-  const { email, password } = await readBody(event);
+  const { account, password } = await readBody(event);
   await createUser({
-     email,
-     name: email.split('@')[0],
+     account,
+     name: account.split('@')[0],
      password: await hash(password)
   });
   return {

@@ -1,4 +1,4 @@
-import type { AuthSession } from "~~/auth/server/utils/session";
+import type { AuthSession } from "../server/utils/session";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
   // Skip plugin when rendering error page
@@ -9,7 +9,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const { data: session, refresh: updateSession }
    = await useFetch<AuthSession>('/api/auth/session');
 
-  const loggedIn: any = computed(() => !!session.value?.email);
+  const loggedIn: any = computed(() => !!session.value?.account);
 
   // Create a ref to know where to redirect the user when logged in
   const redirectTo = useState("authRedirect")

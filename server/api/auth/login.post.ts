@@ -1,10 +1,10 @@
 export default eventHandler(async (event) => {
   const session = await useAuthSession(event);
-  const { email, password } = await readBody(event);
-  const user = await findUserByEmail(email);
+  const { account, password } = await readBody(event);
+  const user = await findUserByAccount(account);
   if (!user) {
     throw createError({
-      message: "Email not found! Please register.",
+      message: "Account not found! Please register.",
       statusCode: 401,
     });
   }
@@ -17,7 +17,7 @@ export default eventHandler(async (event) => {
   await session.update({
       id: user.id,
       name: user.name,
-      email: user.email,
+      account: user.account,
   });
   return session;
 });

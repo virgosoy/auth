@@ -15,11 +15,11 @@ const tabs = [
 ]
 
 const loginForm = ref({
-  email: 'arash@gmail.com',
+  account: 'arash@gmail.com',
   password: 'password',
 })
 const registerForm = ref({
-  email: 'arash@gmail.com',
+  account: 'arash@gmail.com',
   password: 'password',
 })
 const hidden = ref(true)
@@ -40,7 +40,7 @@ const onError = (err: any) => {
   <UContainer :ui="{ constrained: 'max-w-xl' }">
     <UTabs class="p-4" :items="tabs">
       <template #login="{ item }">
-        <UForm :state="loginForm" @submit="authLogin(loginForm.email, loginForm.password).catch(onError)">
+        <UForm :state="loginForm" @submit="authLogin(loginForm.account, loginForm.password).catch(onError)">
           <UCard>
             <template #header>
               <div class="flex">
@@ -56,8 +56,8 @@ const onError = (err: any) => {
               </div>
             </template>
 
-              <UFormGroup label="Email" name="email" class="mb-3" required>
-                <UInput v-model="loginForm.email" placeholder="user@gmail.com" icon="i-heroicons-envelope" />
+              <UFormGroup label="Email" name="account" class="mb-3" required>
+                <UInput v-model="loginForm.account" placeholder="user@gmail.com" icon="i-heroicons-envelope" />
               </UFormGroup>
               <UFormGroup label="Password" name="password" required>
                 <UInput
@@ -87,7 +87,7 @@ const onError = (err: any) => {
         </UForm>
       </template>
       <template #register="{ item }">
-        <UForm :state="registerForm" @submit="authRegister(registerForm.email, registerForm.password).catch(onError)">
+        <UForm :state="registerForm" @submit="authRegister(registerForm.account, registerForm.password).catch(onError)">
           <UCard>
             <template #header>
               <div class="flex">
@@ -103,8 +103,8 @@ const onError = (err: any) => {
               </div>
             </template>
 
-            <UFormGroup label="Email" name="email" class="mb-3" required>
-              <UInput v-model="registerForm.email" placeholder="user@gmail.com" icon="i-heroicons-envelope" />
+            <UFormGroup label="Email" name="account" class="mb-3" required>
+              <UInput v-model="registerForm.account" placeholder="user@gmail.com" icon="i-heroicons-envelope" />
             </UFormGroup>
             <UFormGroup label="Password" name="password" required>
               <UInput

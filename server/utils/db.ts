@@ -10,21 +10,21 @@ export interface User {
   id: string;
   createdAt: string;
   name: string;
-  email: string;
+  account: string;
   password: string;
 }
 
-export async function findUserByEmail(email: string): Promise<User> {
+export async function findUserByAccount(account: string): Promise<User> {
   const storage = useStorage();
-  const key = getUserKey(email!);
+  const key = getUserKey(account!);
   return await storage.getItem(key);
 }
 
 export async function createUser(user: Partial<User>) {
   const storage = useStorage();
-  const key = getUserKey(user.email!);
+  const key = getUserKey(user.account!);
   if (await storage.hasItem(key)) {
-    throw createError({ message: "Email already exists!", statusCode: 409 })
+    throw createError({ message: "Account already exists!", statusCode: 409 })
   }
   return await storage.setItem(key, {
       id: randomUUID(),
@@ -32,16 +32,16 @@ export async function createUser(user: Partial<User>) {
   });
 }
 
-export async function updateUserByEmail(email: string, updates: Partial<User>) {
+export async function updateUserByAccount(account: string, updates: Partial<User>) {
   const storage = useStorage();
-  const user = await findUserByEmail(email);
-  const key = getUserKey(user.email!);
+  const user = await findUserByAccount(account);
+  const key = getUserKey(user.account!);
   return await storage.setItem(key, {
       ...user,
       ...updates,
   });
 }
 
-function getUserKey(email: string) {
-  return `db:auth:users:${encodeURIComponent(email)}`;
+function getUserKey(account: string) {
+  return `db:auth:users:${encodeURIComponent(account)}`;
 }
