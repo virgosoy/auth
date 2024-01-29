@@ -7,6 +7,8 @@ if (!process.env.NUXT_AUTH_PASSWORD) {
   process.env.NUXT_AUTH_PASSWORD = 'secretsecretsecretsecretsecretsecretsecret'
 }
 
+import type { SessionConfig } from "h3";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -14,7 +16,8 @@ export default defineNuxtConfig({
     auth: {
       name: "nuxt-session",
       password: process.env.NUXT_AUTH_PASSWORD || "",
-    },
+      cookie: {secure: false},
+    }, // as SessionConfig
   },
   nitro: {
     storage: {
