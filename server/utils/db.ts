@@ -11,6 +11,9 @@ export interface User {
   createdAt: string;
   name: string;
   account: string;
+  /**
+   * 加密后的，用 await hash(password) 加密
+   */
   password: string;
 }
 
@@ -44,6 +47,7 @@ export async function createUser(user: Partial<User>) {
  * 根据账号更新用户
  * @param account 
  * @param updates 更新的数据
+ * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
  */
 export async function updateUserByAccount(account: string, updates: Partial<User>) {
   const storage = useStorage();
