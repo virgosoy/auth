@@ -4,7 +4,7 @@ import { useStorage as _useStorage } from '#imports';
 import type { Storage, StorageValue } from 'unstorage'
 
 /** 重写 useStorage 给予默认 key */
-const useStorage = <T extends StorageValue>(): Storage<T> => _useStorage<T>('.data:auth')
+const useStorage = <T extends StorageValue>(): Storage<T> => _useStorage<T>('auth')
 
 export interface User {
   id: string;
