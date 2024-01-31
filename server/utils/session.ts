@@ -2,7 +2,7 @@ import type { H3Event, SessionConfig } from "h3";
 import crypto from "uncrypto";
 import type { User } from "./db";
 
-const sessionConfig: SessionConfig = useRuntimeConfig().auth || {};
+const sessionConfig: SessionConfig = useRuntimeConfig().auth.session || {};
 
 export type AuthSession = {
   id: User["id"];
