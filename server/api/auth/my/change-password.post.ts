@@ -8,7 +8,14 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Unauthorized',
     })
   }
-  const user = (await findUserByAccount(session.data.account))!
+  const user = await findUserByAccount(session.data.account)
+  if(!user){
+    // 登录中的用户被删除才会进入
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'User not exists!',
+    })
+  }
   if(user.password !== await hash(oldPassword)){
     throw createError({
       statusCode: 401,
