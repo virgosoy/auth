@@ -9,7 +9,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const { data: session, refresh: updateSession }
    = await useFetch<AuthSession>('/api/auth/session');
 
-  const loggedIn: any = computed(() => !!session.value?.account);
+  const loggedIn = computed(() => !!session.value?.account);
 
   // Create a ref to know where to redirect the user when logged in
   const redirectTo = useState("authRedirect")
