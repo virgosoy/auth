@@ -19,6 +19,10 @@ export default defineNuxtConfig({
         password: process.env.NUXT_AUTH_SESSION_PASSWORD || "",
         cookie: {secure: false},
       }, // as SessionConfig
+      /**
+       * 是否开启前端注册
+       */
+      register: true,
     }, 
   },
   nitro: {
