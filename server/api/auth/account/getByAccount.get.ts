@@ -1,3 +1,4 @@
+import { userForFrontEnd } from "../../../utils/data-convert"
 import type { User } from "../../../utils/db"
 
 export default defineEventHandler(async (event) => {
@@ -6,9 +7,5 @@ export default defineEventHandler(async (event) => {
   const account = query.account
   
   const user = await findUserByAccount(account)
-  if(user){
-    const { password, ...newUser} = user
-    return newUser as Omit<User, 'password'>
-  }
-  return undefined
+  return userForFrontEnd(user)
 })
