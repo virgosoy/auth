@@ -6,6 +6,18 @@ async function listAccount() {
   const res = await $fetch('/api/auth/account')
   accounts.value = res
 }
+
+const account = ref('')
+const user = ref<Omit<User, 'password'>>()
+async function getByAccount() {
+  const res = await $fetch('/api/auth/account/getByAccount', {
+    query: {
+      account: account.value
+    }
+  })
+  console.log({res})
+  user.value = res
+}
 </script>
 
 <template>
@@ -16,5 +28,8 @@ async function listAccount() {
         <span>{{ account.account }}</span>
       </li>
     </ul>
+    <UInput v-model="account"></UInput>
+    <UButton @click="getByAccount">getByAccount</UButton>
+    <div>{{ user }}</div>
   </div>
 </template>
