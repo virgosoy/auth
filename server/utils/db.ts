@@ -1,10 +1,10 @@
 import { randomUUID } from 'uncrypto';
 // @ts-ignore: js 是正常的，ts 不正常，相关见：https://nitro.unjs.io/guide/auto-imports#manual-imports
-import { useStorage as _useStorage } from '#imports';
+// import { useStorage as _useStorage } from '#imports';
 import type { Storage, StorageValue } from 'unstorage'
 
 /** 重写 useStorage 给予默认 key */
-const useStorage = <T extends StorageValue>(): Storage<T> => _useStorage<T>('auth')
+// const useStorage = <T extends StorageValue>(): Storage<T> => _useStorage<T>('auth')
 
 export interface User {
   id: string;
@@ -15,6 +15,22 @@ export interface User {
    * 加密后的，用 await hash(password) 加密
    */
   password: string;
+}
+
+/**
+ * key 前缀
+ */
+const KEY_PREFIX = 'auth:users:'
+
+/**
+ * 列出所有账号
+ */
+export async function listAccount() {
+  const storage = useStorage()
+  const keys = await storage.getKeys(KEY_PREFIX);
+  const items = await storage.getItems(keys)
+  const accounts = items.map(item => item.value as User)
+  return accounts
 }
 
 /**
@@ -63,5 +79,5 @@ export async function updateUserByAccount(account: string, updates: Partial<User
 }
 
 function getUserKey(account: string) {
-  return `db:auth:users:${encodeURIComponent(account)}`;
+  return `${KEY_PREFIX}${encodeURIComponent(account)}`;
 }
