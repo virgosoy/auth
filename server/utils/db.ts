@@ -6,6 +6,9 @@ import type { Storage, StorageValue } from 'unstorage'
 /** 重写 useStorage 给予默认 key */
 // const useStorage = <T extends StorageValue>(): Storage<T> => _useStorage<T>('auth')
 
+/**
+ * 用户
+ */
 export interface User {
   id: string;
   createdAt: string;
