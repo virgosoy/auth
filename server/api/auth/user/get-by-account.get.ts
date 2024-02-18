@@ -1,5 +1,4 @@
 import { userForFrontEnd } from "../../../utils/data-convert"
-import type { User } from "../../../utils/db"
 
 export default defineEventHandler(async (event) => {
   // 查询参数

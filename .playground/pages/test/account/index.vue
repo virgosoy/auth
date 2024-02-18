@@ -3,14 +3,14 @@ import type { User } from '../../../../server/utils/db';
 
 const accounts = ref<Omit<User, 'password'>[]>([])
 async function listAccount() {
-  const res = await $fetch('/api/auth/account')
+  const res = await $fetch('/api/auth/user/list')
   accounts.value = res
 }
 
 const account = ref('')
 const user = ref<Omit<User, 'password'>>()
 async function getByAccount() {
-  const res = await $fetch('/api/auth/account/getByAccount', {
+  const res = await $fetch('/api/auth/user/get-by-account', {
     query: {
       account: account.value
     }
