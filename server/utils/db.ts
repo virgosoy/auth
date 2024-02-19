@@ -28,7 +28,7 @@ const KEY_PREFIX = 'auth:users:'
 /**
  * 列出所有账号
  */
-export async function listAccount() {
+export async function listUser() {
   const storage = useStorage()
   const keys = await storage.getKeys(KEY_PREFIX);
   const items = await storage.getItems(keys)

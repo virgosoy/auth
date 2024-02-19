@@ -2,7 +2,7 @@
 import type { User } from '../../../../server/utils/db';
 
 const accounts = ref<Omit<User, 'password'>[]>([])
-async function listAccount() {
+async function listUser() {
   const res = await $fetch('/api/auth/user/list')
   accounts.value = res
 }
@@ -44,7 +44,7 @@ async function updateUser() {
 
 <template>
   <div>
-    <UButton @click="listAccount">listAccount</UButton>
+    <UButton @click="listUser">listUser</UButton>
     <ul>
       <li v-for="account in accounts">
         <span>{{ account.account }}</span>
