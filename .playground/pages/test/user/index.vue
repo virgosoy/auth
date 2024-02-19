@@ -18,6 +18,17 @@ async function getByAccount() {
   console.log({res})
   user.value = res
 }
+
+const password = ref('')
+async function addUser() {
+  await $fetch('/api/auth/user/add', {
+    method: 'POST',
+    body: {
+      account: account.value,
+      password: password.value
+    }
+  })
+}
 </script>
 
 <template>
@@ -31,5 +42,12 @@ async function getByAccount() {
     <UInput v-model="account"></UInput>
     <UButton @click="getByAccount">getByAccount</UButton>
     <div>{{ user }}</div>
+    <UFormGroup label="account">
+      <UInput v-model="account"></UInput>
+    </UFormGroup>
+    <UFormGroup label="password">
+      <UInput v-model="password"></UInput>
+    </UFormGroup>
+    <UButton @click="addUser">addUser</UButton>
   </div>
 </template>
