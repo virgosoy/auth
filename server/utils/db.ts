@@ -81,6 +81,34 @@ export async function updateUserByAccount(account: string, updates: Partial<User
   });
 }
 
+/**
+ * 根据 id 更新用户
+ * @param updates 
+ * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
+ */
+export async function updateUserById(updates: Partial<User>) {
+  
+  const storage = useStorage()
+  const keys = await storage.getKeys(KEY_PREFIX);
+  const items = await storage.getItems(keys)
+  const item = items.find(item => (item.value as User).id === updates.id)
+  
+  if (!item) {
+    throw createError({ message: 'User not found!', statusCode: 404 });
+  }
+  
+  const key = item.key
+  const user = item.value as User
+  const newKey = getUserKey(updates.account ?? user.account)
+  if(newKey !== key){
+    await storage.removeItem(key)
+  }
+  return await storage.setItem(newKey, {
+      ...user,
+      ...updates,
+  });
+}
+
 function getUserKey(account: string) {
   return `${KEY_PREFIX}${encodeURIComponent(account)}`;
 }

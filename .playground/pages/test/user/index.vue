@@ -29,6 +29,17 @@ async function addUser() {
     }
   })
 }
+
+async function updateUser() {
+  await $fetch('/api/auth/user', {
+    method: 'PUT',
+    body: {
+      id: user!.value!.id,
+      account: account.value,
+      ...password.value && {password: password.value}
+    }
+  })
+}
 </script>
 
 <template>
@@ -49,5 +60,6 @@ async function addUser() {
       <UInput v-model="password"></UInput>
     </UFormGroup>
     <UButton @click="addUser">addUser</UButton>
+    <UButton @click="updateUser">updateUser</UButton>
   </div>
 </template>
