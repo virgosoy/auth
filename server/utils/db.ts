@@ -1,4 +1,4 @@
-import { randomUUID } from 'uncrypto';
+
 // @ts-ignore: js 是正常的，ts 不正常，相关见：https://nitro.unjs.io/guide/auto-imports#manual-imports
 // import { useStorage as _useStorage } from '#imports';
 import type { Storage, StorageValue } from 'unstorage'
@@ -20,95 +20,48 @@ export interface User {
   password: string;
 }
 
-/**
- * key 前缀
- */
-const KEY_PREFIX = 'auth:users:'
-
-/**
- * 列出所有账号
- */
-export async function listUser() {
-  const storage = useStorage()
-  const keys = await storage.getKeys(KEY_PREFIX);
-  const items = await storage.getItems(keys)
-  const accounts = items.map(item => item.value as User)
-  return accounts
+interface UserDb {
+  /**
+   * 列出所有账号
+   */
+  listUser(): Promise<User[]>
+  /**
+   * 根据账号查找用户
+   * @param account 
+   */
+  findUserByAccount(account: string): Promise<User | null>
+  /**
+   * 创建用户
+   * @param user.password 是经过 hash 的，可以使用 await hash(password) 生成 
+   */
+  createUser(user: Partial<User>): Promise<void>
+  /**
+   * 根据账号更新用户
+   * @param account 
+   * @param updates 更新的数据
+   * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
+   */
+  updateUserByAccount(account: string, updates: Partial<User>): Promise<void>
+  /**
+   * 根据 id 更新用户
+   * @param updates 
+   * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
+   */
+  updateUserById(updates: Partial<User>): Promise<void>
 }
 
-/**
- * 根据账号查找用户
- * @param account 
- */
-export async function findUserByAccount(account: string): Promise<User | null> {
-  const storage = useStorage();
-  const key = getUserKey(account!);
-  return await storage.getItem(key);
+const wrapper = new Proxy({} as UserDb, {
+  get(target, p, receiver) {
+    // @ts-ignore
+    return (...args) => userDb[p](...args)
+  },
+})
+
+let userDb: UserDb
+
+export function defineUserDb(userDb_: UserDb){
+  userDb = userDb_
 }
 
-/**
- * 创建用户
- * @param user.password 是经过 hash 的，可以使用 await hash(password) 生成 
- */
-export async function createUser(user: Partial<User>) {
-  const storage = useStorage();
-  const key = getUserKey(user.account!);
-  if (await storage.hasItem(key)) {
-    throw createError({ message: "Account already exists!", statusCode: 409 })
-  }
-  return await storage.setItem(key, {
-      id: randomUUID(),
-      ...user,
-  });
-}
+export const { listUser, findUserByAccount, createUser, updateUserByAccount, updateUserById } = wrapper
 
-/**
- * 根据账号更新用户
- * @param account 
- * @param updates 更新的数据
- * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
- */
-export async function updateUserByAccount(account: string, updates: Partial<User>) {
-  const storage = useStorage();
-  const user = await findUserByAccount(account);
-  if (!user) {
-    throw createError({ message: 'User not found!', statusCode: 404 });
-  }
-  const key = getUserKey(user.account!);
-  return await storage.setItem(key, {
-      ...user,
-      ...updates,
-  });
-}
-
-/**
- * 根据 id 更新用户
- * @param updates 
- * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
- */
-export async function updateUserById(updates: Partial<User>) {
-  
-  const storage = useStorage()
-  const keys = await storage.getKeys(KEY_PREFIX);
-  const items = await storage.getItems(keys)
-  const item = items.find(item => (item.value as User).id === updates.id)
-  
-  if (!item) {
-    throw createError({ message: 'User not found!', statusCode: 404 });
-  }
-  
-  const key = item.key
-  const user = item.value as User
-  const newKey = getUserKey(updates.account ?? user.account)
-  if(newKey !== key){
-    await storage.removeItem(key)
-  }
-  return await storage.setItem(newKey, {
-      ...user,
-      ...updates,
-  });
-}
-
-function getUserKey(account: string) {
-  return `${KEY_PREFIX}${encodeURIComponent(account)}`;
-}
