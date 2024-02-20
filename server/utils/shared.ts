@@ -20,3 +20,18 @@ export function create404Error(event: H3Event) {
     statusMessage: process.env.NODE_ENV === 'development' ? `Forbidden: ${event.path}` : `Page not found: ${event.path}`,
   })
 }
+
+/**
+ * 抛出 500 （服务器）错误 \
+ * 服务器自身的问题，如初始配置不对。
+ */
+export function throw500Error(event: H3Event, msg?: string): never {
+  throw createError({
+    data: {
+      path: event.path,
+    },
+    // fatal: false,
+    statusCode: 500,
+    statusMessage: `Internal Server Error: ${event.path} ${msg || ''}`,
+  })
+}

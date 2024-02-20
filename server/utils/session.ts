@@ -1,14 +1,10 @@
 import type { H3Event, SessionConfig } from "h3";
 import crypto from "uncrypto";
-import type { User } from "./db";
+import type { AuthenticationHook } from "./auth-core";
 
 const sessionConfig: SessionConfig = useRuntimeConfig().auth.session || {};
 
-export type AuthSession = {
-  id: User["id"];
-  name: User["name"];
-  account: User["account"];
-};
+export type AuthSession = Parameters<AuthenticationHook>
 
 export const useAuthSession = async (event: H3Event) => {
   const session = await useSession<AuthSession>(event, sessionConfig);
