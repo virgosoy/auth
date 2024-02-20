@@ -4,7 +4,12 @@ import type { AuthenticationHook } from "./auth-core";
 
 const sessionConfig: SessionConfig = useRuntimeConfig().auth.session || {};
 
-export type AuthSession = Parameters<AuthenticationHook>
+export type AuthSession = {
+  /**
+   * 用户，有值表示已经验证（登录）
+   */
+  user: Parameters<AuthenticationHook>
+}
 
 export const useAuthSession = async (event: H3Event) => {
   const session = await useSession<AuthSession>(event, sessionConfig);
@@ -13,12 +18,12 @@ export const useAuthSession = async (event: H3Event) => {
 
 export const requireAuthSession = async (event: H3Event) => {
   const session = await useAuthSession(event);
-    if (!session.data.account) {
-      throw createError({
-        message: "Not Authorized",
-        statusCode: 401,
-      });
-    }
+  if (!session.data.user) {
+    throw createError({
+      message: "Not Authenticated", // Authorized
+      statusCode: 401,
+    });
+  }
   return session;
 }
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { $auth } = useNuxtApp()
 
-const icon = computed(() => $auth.session.value?.account ? 'i-heroicons-lock-open' : 'i-heroicons-lock-closed')
+const icon = computed(() => $auth.loggedIn ? 'i-heroicons-lock-open' : 'i-heroicons-lock-closed')
 </script>
 
 <template>

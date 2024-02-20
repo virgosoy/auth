@@ -51,7 +51,9 @@ export async function login<T extends AuthenticationHook>(event: H3Event, ...arg
     })
   }
   const session = await useAuthSession(event)
-  await session.update(sessionData)
+  await session.update({
+    user: sessionData,
+  })
 }
 
 /**
