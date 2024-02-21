@@ -1,23 +1,42 @@
+import type { BaseUserSessionData } from "../server/utils/auth-core";
+
 export const useAuth = () => useNuxtApp().$auth
 
 /**
  * 登录 \
  * 错误时返回 reject
- * @param account 账号
- * @param password 密码
+ * @param token -
  */
-export const authLogin = async (account: string, password: string) => {
+async function login<Token extends {} = {}>(token: Token){
   await $fetch("/api/auth/login", {
     method: "POST",
-    body: {
-      account,
-      password,
-    },
+    body: token,
   });
   useAuth().redirectTo.value = null;
-  await useAuth().updateSession();
+  await useAuth().refreshSession();
   await navigateTo(useAuth().redirectTo.value || "/");
-};
+}
+
+/**
+ * 当前用户退出登录
+ */
+async function logout() {
+  await $fetch("/api/auth/logout", {
+    method: "POST",
+  });
+  await useAuth().refreshSession();
+}
+
+/**
+ * 使用 auth 客户端
+ */
+export function useAuthClient<Token extends {} = {}, UserSessionData extends BaseUserSessionData = BaseUserSessionData>() {
+  return {
+    login: login<Token>,
+    logout,
+  }
+}
+
 
 /**
  * 注册并登录
@@ -32,15 +51,6 @@ export const authRegister = async (account: string, password: string) => {
       password,
     },
   });
-  return await authLogin(account, password);
+  return await login({account, password});
 };
 
-/**
- * 当前用户退出登录
- */
-export const authLogout = async () => {
-  await $fetch("/api/auth/logout", {
-    method: "POST",
-  });
-  await useAuth().updateSession();
-};

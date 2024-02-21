@@ -1,6 +1,6 @@
 export default eventHandler(async (event) => {
   const auth = await requireAuthSession(event);
   return {
-    message: `You are accessing secret api with account: ${auth.data.user.account}`,
+    message: `You are accessing secret api with user: ${auth.data.user}`,
   };
 });

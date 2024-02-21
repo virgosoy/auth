@@ -8,6 +8,7 @@ definePageMeta({
 });
 
 const { data: session } = await useFetch("/api/auth/session", { headers: useRequestHeaders(['cookie'])});
+const { logout } = useMyAuth()
 </script>
 
 <template>
@@ -16,6 +17,6 @@ const { data: session } = await useFetch("/api/auth/session", { headers: useRequ
     <div>Name: <UInput :model-value="$auth.sessionData.value?.user?.name" read-only /></div>
     <div>Email: <UInput :model-value="$auth.sessionData.value?.user?.account" read-only /></div>
     <br>
-    <UButton @click="authLogout()">Logout</UButton>
+    <UButton @click="logout()">Logout</UButton>
   </div>
 </template>

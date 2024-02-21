@@ -34,13 +34,15 @@ const onError = (err: any) => {
     description: err?.data.message ?? err?.message ?? err,
   })
 }
+
+const { login } = useMyAuth()
 </script>
 
 <template>
   <UContainer :ui="{ constrained: 'max-w-xl' }">
     <UTabs class="p-4" :items="tabs">
       <template #login="{ item }">
-        <UForm :state="loginForm" @submit="authLogin(loginForm.account, loginForm.password).catch(onError)">
+        <UForm :state="loginForm" @submit="login({account: loginForm.account, password: loginForm.password}).catch(onError)">
           <UCard>
             <template #header>
               <div class="flex">

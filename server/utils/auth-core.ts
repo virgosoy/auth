@@ -6,7 +6,7 @@ import { throw500Error } from './shared'
  * 基础的 session 用户数据（一般是 PrimaryPrincipal），是实际用户数据的基类 \
  * 必须要有，来确认当前用户是谁。
  */
-export type BaseUserSessionData = {} | Record<string, any>
+export type BaseUserSessionData = {}
 
 /**
  * 认证（登录）

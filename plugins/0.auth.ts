@@ -6,8 +6,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     return {};
   }
 
-  const { data: sessionData, refresh: updateSession }
-   = await useFetch<AuthSession>('/api/auth/session');
+  const { data: sessionData, refresh: refreshSession }
+    = await useFetch<AuthSession>('/api/auth/session');
 
   const loggedIn = computed(() => !!sessionData.value?.user);
 
@@ -55,7 +55,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         loggedIn,
         sessionData,
         redirectTo,
-        updateSession,
+        refreshSession,
       },
     },
   };
