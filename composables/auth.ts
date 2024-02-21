@@ -37,20 +37,3 @@ export function useAuthClient<Token extends {} = {}, UserSessionData extends Bas
   }
 }
 
-
-/**
- * 注册并登录
- * @param account 账号
- * @param password 密码
- */
-export const authRegister = async (account: string, password: string) => {
-  await $fetch("/api/auth/register", {
-    method: "POST",
-    body: {
-      account,
-      password,
-    },
-  });
-  return await login({account, password});
-};
-

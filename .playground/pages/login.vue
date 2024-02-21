@@ -36,6 +36,7 @@ const onError = (err: any) => {
 }
 
 const { login } = useMyAuth()
+const { register } = useMyUser()
 </script>
 
 <template>
@@ -89,7 +90,7 @@ const { login } = useMyAuth()
         </UForm>
       </template>
       <template #register="{ item }">
-        <UForm :state="registerForm" @submit="authRegister(registerForm.account, registerForm.password).catch(onError)">
+        <UForm :state="registerForm" @submit="register({account: registerForm.account, password: registerForm.password}).catch(onError)">
           <UCard>
             <template #header>
               <div class="flex">

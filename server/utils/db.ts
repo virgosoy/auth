@@ -22,6 +22,7 @@ export interface User {
 
 interface UserDb<
   UserT extends Record<string, any> = Record<string, any>, 
+  RegistrationInfo extends Record<string, any> = Record<string, any>,
   UserForFrontEndT extends Record<string, any> = Record<string, any>
 > {
   /**
@@ -38,6 +39,12 @@ interface UserDb<
    * @param user.password 是经过 hash 的，可以使用 await hash(password) 生成 
    */
   createUser(user: Partial<UserT>): Promise<void>
+  /**
+   * 注册，和 {@link createUser} 类似，但是是面向用户的
+   * @param registrationInfo 
+   * @implements 实现的时候建议底层调用 {@link createUser}
+   */
+  register(registrationInfo: RegistrationInfo): Promise<void>
   /**
    * 根据账号更新用户
    * @param account 
@@ -63,8 +70,9 @@ let userDb: UserDb
 
 export function defineUserDb<
   UserT extends Record<string, any> = Record<string, any>, 
+  RegistrationInfoT extends Record<string, any> = Record<string, any>, 
   UserForFrontEndT extends Record<string, any> = Record<string, any>
->(userDb_: UserDb<UserT, UserForFrontEndT>){
+>(userDb_: UserDb<UserT, RegistrationInfoT, UserForFrontEndT>){
   userDb = userDb_
 }
 

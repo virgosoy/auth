@@ -2,17 +2,13 @@ import { useUserDb } from "../../utils/db";
 import { create404Error } from "../../utils/shared";
 
 export default eventHandler(async (event) => {
-  const { register } = useRuntimeConfig().auth
-  if(!register){
+  const { register: canRegister } = useRuntimeConfig().auth
+  if(!canRegister){
     throw create404Error(event);
   }
-  const { account, password } = await readBody(event);
-  const { createUser } = useUserDb()
-  await createUser({
-     account,
-     name: account.split('@')[0],
-     password: await hash(password)
-  });
+  const { register } = useUserDb()
+  const body = await readBody(event);
+  await register(body)
   return {
     message: "Successfully registered!",
   };

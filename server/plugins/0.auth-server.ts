@@ -46,6 +46,24 @@ export default defineNitroPlugin((nirtoApp) => {
   function getUserKey(account: string) {
     return `${KEY_PREFIX}${encodeURIComponent(account)}`;
   }
+  
+  async function findUserByAccount(account: string): Promise<User | null> {
+    const storage = useStorage();
+    const key = getUserKey(account!);
+    return await storage.getItem(key);
+  }
+  async function createUser(user: Partial<User>) {
+    const storage = useStorage();
+    const key = getUserKey(user.account!);
+    if (await storage.hasItem(key)) {
+      throw createError({ message: "Account already exists!", statusCode: 409 })
+    }
+    return await storage.setItem(key, {
+        id: randomUUID(),
+        ...user,
+    });
+  }
+  
   defineUserDb({
     async listUser() {
       const storage = useStorage()
@@ -54,20 +72,13 @@ export default defineNitroPlugin((nirtoApp) => {
       const accounts = items.map(item => item.value as User)
       return accounts
     },
-    async findUserByAccount(account: string): Promise<User | null> {
-      const storage = useStorage();
-      const key = getUserKey(account!);
-      return await storage.getItem(key);
-    },
-    async createUser(user: Partial<User>) {
-      const storage = useStorage();
-      const key = getUserKey(user.account!);
-      if (await storage.hasItem(key)) {
-        throw createError({ message: "Account already exists!", statusCode: 409 })
-      }
-      return await storage.setItem(key, {
-          id: randomUUID(),
-          ...user,
+    findUserByAccount,
+    createUser,
+    async register(registrationInfo: {account: string, password: string}) {
+      await createUser({
+        account: registrationInfo.account,
+        name: registrationInfo.account.split('@')[0],
+        password: await hash(registrationInfo.password)
       });
     },
     async updateUserByAccount(account: string, updates: Partial<User>) {
