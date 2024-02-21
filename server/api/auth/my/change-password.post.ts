@@ -1,3 +1,5 @@
+import { useUserDb } from "../../../utils/db"
+
 export default defineEventHandler(async (event) => {
   // 请求体
   const { oldPassword, newPassword } = await readBody<{oldPassword: string, newPassword: string}>(event)
@@ -8,6 +10,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Unauthorized',
     })
   }
+  const { findUserByAccount } = useUserDb()
   const user = await findUserByAccount(session.data.account)
   if(!user){
     // 登录中的用户被删除才会进入
@@ -22,6 +25,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Incorrect old password!',
     })
   }
+  const { updateUserByAccount } = useUserDb()
   updateUserByAccount(session.data.account, { password: await hash(newPassword) })
 
   return {

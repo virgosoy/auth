@@ -1,3 +1,4 @@
+import { useUserDb } from "../../utils/db";
 import { create404Error } from "../../utils/shared";
 
 export default eventHandler(async (event) => {
@@ -6,6 +7,7 @@ export default eventHandler(async (event) => {
     throw create404Error(event);
   }
   const { account, password } = await readBody(event);
+  const { createUser } = useUserDb()
   await createUser({
      account,
      name: account.split('@')[0],

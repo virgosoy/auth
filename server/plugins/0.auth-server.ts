@@ -3,7 +3,7 @@
 console.log('Module Load - auth-server')
 
 import { randomUUID } from 'uncrypto';
-import { defineUserDb } from '../utils/db';
+import { defineUserDb, useUserDb } from '../utils/db';
 import { useAuthServer } from '../utils/auth-core';
 
 export default defineNitroPlugin((nirtoApp) => {
@@ -12,6 +12,7 @@ export default defineNitroPlugin((nirtoApp) => {
   useAuthServer({
     // 应该按实际业务去编写 AuthenticationHook 接口的签名
     authenticationHook: async ({account, password} : {account: string, password: string}) => {
+      const { findUserByAccount } = useUserDb()
       const user = await findUserByAccount(account)
       if(!user){
         throw createError({
@@ -102,6 +103,10 @@ export default defineNitroPlugin((nirtoApp) => {
           ...user,
           ...updates,
       });
+    },
+    userForFrontEnd(user){
+      const { password, ...result } = user
+      return result
     }
   })
 

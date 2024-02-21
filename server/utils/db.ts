@@ -20,48 +20,58 @@ export interface User {
   password: string;
 }
 
-interface UserDb {
+interface UserDb<
+  UserT extends Record<string, any> = Record<string, any>, 
+  UserForFrontEndT extends Record<string, any> = Record<string, any>
+> {
   /**
    * 列出所有账号
    */
-  listUser(): Promise<User[]>
+  listUser(): Promise<UserT[]>
   /**
    * 根据账号查找用户
    * @param account 
    */
-  findUserByAccount(account: string): Promise<User | null>
+  findUserByAccount(account: string): Promise<UserT | null>
   /**
    * 创建用户
    * @param user.password 是经过 hash 的，可以使用 await hash(password) 生成 
    */
-  createUser(user: Partial<User>): Promise<void>
+  createUser(user: Partial<UserT>): Promise<void>
   /**
    * 根据账号更新用户
    * @param account 
    * @param updates 更新的数据
    * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
    */
-  updateUserByAccount(account: string, updates: Partial<User>): Promise<void>
+  updateUserByAccount(account: string, updates: Partial<UserT>): Promise<void>
   /**
    * 根据 id 更新用户
    * @param updates 
    * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
    */
-  updateUserById(updates: Partial<User>): Promise<void>
-}
+  updateUserById(updates: Partial<UserT>): Promise<void>
 
-const userDbWrapper = new Proxy({} as UserDb, {
-  get(target, p, receiver) {
-    // @ts-ignore
-    return (...args) => userDb[p](...args)
-  },
-})
+  /**
+   * 给前端展示的用户，去除敏感信息，如密码
+   * @param user -
+   */
+  userForFrontEnd(user: UserT): UserForFrontEndT
+}
 
 let userDb: UserDb
 
-export function defineUserDb(userDb_: UserDb){
+export function defineUserDb<
+  UserT extends Record<string, any> = Record<string, any>, 
+  UserForFrontEndT extends Record<string, any> = Record<string, any>
+>(userDb_: UserDb<UserT, UserForFrontEndT>){
   userDb = userDb_
 }
 
-export const { listUser, findUserByAccount, createUser, updateUserByAccount, updateUserById } = userDbWrapper
-
+/**
+ * 使用 UserDb \
+ * 必须先使用 {@link defineUserDb} 设置 userDb 后才可以使用。
+ */
+export function useUserDb(){
+  return userDb
+}
