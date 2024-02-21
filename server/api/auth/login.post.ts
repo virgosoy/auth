@@ -1,6 +1,7 @@
-import type { MyAuthenticationHook } from "../../plugins/0.auth-server";
+import { _useAuthServer } from "../../utils/auth-core"
 
 export default eventHandler(async (event) => {
-  const { account, password } = await readBody(event);
-  await login<MyAuthenticationHook>(event, { account, password })
+  const body = await readBody(event);
+  const { login }= _useAuthServer()
+  await login(event, body)
 });
