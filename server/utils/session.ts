@@ -3,15 +3,15 @@ import crypto from "uncrypto";
 
 const sessionConfig: SessionConfig = useRuntimeConfig().auth.session || {};
 
-export type AuthSession<SessionData = any> = {
+export type AuthSession<UserSessionData = any> = {
   /**
    * 用户，有值表示已经认证（登录）
    */
-  user: SessionData
+  user: UserSessionData
 }
 
-export const useAuthSession = async <SessionData = any>(event: H3Event) => {
-  const session = await useSession<AuthSession<SessionData>>(event, sessionConfig);
+export const useAuthSession = async <UserSessionData = any>(event: H3Event) => {
+  const session = await useSession<AuthSession<UserSessionData>>(event, sessionConfig);
   return session
 };
 

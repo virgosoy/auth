@@ -5,13 +5,13 @@ import { throw500Error } from './shared'
 /**
  * 认证（登录）
  */
-interface AuthenticationHook<Token = any, SessionData = any> {
+interface AuthenticationHook<Token = any, UserSessionData = any> {
   /**
    * 认证
    * @param arg 登录附加参数
    * @returns 要存放到 session 的数据
    */
-  (arg: Token): Promise<SessionData>
+  (arg: Token): Promise<UserSessionData>
   // (arg: {account: string, password: string}): Promise<{id: number, account: string}>
 }
 /**
@@ -21,11 +21,11 @@ interface AuthorizationHook {
   (arg: {event: H3Event, permKey: string}): Promise<boolean>
 }
 
-interface AuthServerConfig<Token = any, SessionData = any> {
+interface AuthServerConfig<Token = any, UserSessionData = any> {
   /**
    * 认证
    */
-  authenticationHook: AuthenticationHook<Token, SessionData>
+  authenticationHook: AuthenticationHook<Token, UserSessionData>
   /**
    * 授权
    */
@@ -40,7 +40,7 @@ let authServer: ReturnType<typeof useAuthServer<any, any>>
 /**
  * 内部使用，用于获取 {@link useAuthServer} 执行后的结果并使用
  */
-export function _useAuthServer<Token = any, SessionData = any>(): ReturnType<typeof useAuthServer<Token, SessionData>> {
+export function _useAuthServer<Token = any, UserSessionData = any>(): ReturnType<typeof useAuthServer<Token, UserSessionData>> {
   return authServer
 }
 
@@ -49,10 +49,10 @@ export function _useAuthServer<Token = any, SessionData = any>(): ReturnType<typ
  * **全局只能执行一次**，多次执行可能会导致之前配置都不生效。
  * @param param0 AuthServerConfig
  */
-export function useAuthServer<Token = any, SessionData = any>({
+export function useAuthServer<Token = any, UserSessionData = any>({
   authenticationHook,
   authorizationHook,
-}: AuthServerConfig<Token, SessionData>){
+}: AuthServerConfig<Token, UserSessionData>){
 
   // function registAuthenticationHook(authenticationHook_: AuthenticationHook){
   //   if(authenticationHook){
@@ -84,7 +84,7 @@ export function useAuthServer<Token = any, SessionData = any>({
         statusMessage: 'Authentication failed!',
       })
     }
-    const session = await useAuthSession<SessionData>(event)
+    const session = await useAuthSession<UserSessionData>(event)
     await session.update({
       user: sessionData,
     })
