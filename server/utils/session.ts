@@ -8,7 +8,7 @@ export type AuthSession<UserSessionData extends BaseUserSessionData = BaseUserSe
   /**
    * 用户，有值表示已经认证（登录）
    */
-  user: UserSessionData
+  user?: UserSessionData
 }
 
 export const useAuthSession = async <UserSessionData extends BaseUserSessionData = BaseUserSessionData>(event: H3Event) => {

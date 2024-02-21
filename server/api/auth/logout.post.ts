@@ -1,6 +1,8 @@
+import { _useAuthServer } from "../../utils/auth-core";
+
 export default eventHandler(async (event) => {
-  const session = await useAuthSession(event);
-  await session.clear();
+  const { logout } = _useAuthServer()
+  await logout(event)
   return {
     message: "Successfully logged out!",
   };

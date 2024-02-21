@@ -96,6 +96,11 @@ export function useAuthServer<Token = any, UserSessionData extends BaseUserSessi
     })
   }
 
+  async function logout(event: H3Event) {
+    const session = await useAuthSession<UserSessionData>(event)
+    await session.clear();
+  }
+
   /**
    * 是否有权限
    * @param event 
@@ -109,6 +114,7 @@ export function useAuthServer<Token = any, UserSessionData extends BaseUserSessi
 
   const result = {
     login,
+    logout,
     hasAuth,
   }
   authServer = result
