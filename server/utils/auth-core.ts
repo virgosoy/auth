@@ -3,27 +3,34 @@ import { throw500Error } from './shared'
 
 
 /**
- * 基础的 session 用户数据，一般是 PrimaryPrincipal，必须要有。
+ * 基础的 session 用户数据（一般是 PrimaryPrincipal），是实际用户数据的基类 \
+ * 必须要有，来确认当前用户是谁。
  */
 export type BaseUserSessionData = {}
 
 /**
  * 认证（登录）
- * @template UserSessionData 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，后续会根据这个判断用户是否认证
+ * @template UserSessionData 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，来确认当前用户是谁，后续会根据这个判断用户是否认证
  */
 interface AuthenticationHook<Token = any, UserSessionData extends BaseUserSessionData = BaseUserSessionData> {
   /**
    * 认证
-   * @param arg 登录附加参数
+   * @param token 登录附加参数
    * @returns 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，后续会根据这个判断用户是否认证
    */
-  (arg: Token): Promise<UserSessionData>
-  // (arg: {account: string, password: string}): Promise<{id: number, account: string}>
+  (token: Token): Promise<UserSessionData>
+  // (token: {account: string, password: string}): Promise<{id: number, account: string}>
 }
 /**
  * 授权
  */
 interface AuthorizationHook {
+  /**
+   * 授权
+   * @param arg.event H3Event
+   * @param arg.permKey 要判断的权限 key
+   * @returns 是否有权限
+   */
   (arg: {event: H3Event, permKey: string}): Promise<boolean>
 }
 
@@ -60,20 +67,6 @@ export function useAuthServer<Token = any, UserSessionData extends BaseUserSessi
   authorizationHook,
 }: AuthServerConfig<Token, UserSessionData>){
 
-  // function registAuthenticationHook(authenticationHook_: AuthenticationHook){
-  //   if(authenticationHook){
-  //     throw new Error('authentication hook is already registered')
-  //   }
-  //   authenticationHook = authenticationHook_
-  // }
-
-  // function registAuthorizationHook(authorizationHook_: AuthorizationHook){
-  //   if(authorizationHook){
-  //     throw new Error('authorization hook is already registered')
-  //   }
-  //   authorizationHook = authorizationHook_
-  // }
-
   /**
    * 登录
    * @param event H3Event
@@ -82,7 +75,6 @@ export function useAuthServer<Token = any, UserSessionData extends BaseUserSessi
   async function login(event: H3Event, token: Token){
     // 认证
     const sessionData = 
-      // @ts-ignore
       await (authenticationHook ?? throw500Error(event, 'authentication hook is not registered'))(token)
     if(!sessionData){
       throw createError({
@@ -96,9 +88,14 @@ export function useAuthServer<Token = any, UserSessionData extends BaseUserSessi
     })
   }
 
+  /**
+   * 登出
+   * @param event H3Event
+   */
   async function logout(event: H3Event) {
     const session = await useAuthSession<UserSessionData>(event)
     await session.clear();
+    // 其实只要清掉 session.data.user 即可。
   }
 
   /**
