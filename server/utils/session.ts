@@ -1,16 +1,17 @@
 import type { H3Event, SessionConfig } from "h3";
 import crypto from "uncrypto";
+import type { BaseUserSessionData } from "./auth-core";
 
 const sessionConfig: SessionConfig = useRuntimeConfig().auth.session || {};
 
-export type AuthSession<UserSessionData = any> = {
+export type AuthSession<UserSessionData extends BaseUserSessionData = BaseUserSessionData> = {
   /**
    * 用户，有值表示已经认证（登录）
    */
   user: UserSessionData
 }
 
-export const useAuthSession = async <UserSessionData = any>(event: H3Event) => {
+export const useAuthSession = async <UserSessionData extends BaseUserSessionData = BaseUserSessionData>(event: H3Event) => {
   const session = await useSession<AuthSession<UserSessionData>>(event, sessionConfig);
   return session
 };

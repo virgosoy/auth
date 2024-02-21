@@ -3,13 +3,19 @@ import { throw500Error } from './shared'
 
 
 /**
- * 认证（登录）
+ * 基础的 session 用户数据，一般是 PrimaryPrincipal，必须要有。
  */
-interface AuthenticationHook<Token = any, UserSessionData = any> {
+export type BaseUserSessionData = {}
+
+/**
+ * 认证（登录）
+ * @template UserSessionData 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，后续会根据这个判断用户是否认证
+ */
+interface AuthenticationHook<Token = any, UserSessionData extends BaseUserSessionData = BaseUserSessionData> {
   /**
    * 认证
    * @param arg 登录附加参数
-   * @returns 要存放到 session 的数据
+   * @returns 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，后续会根据这个判断用户是否认证
    */
   (arg: Token): Promise<UserSessionData>
   // (arg: {account: string, password: string}): Promise<{id: number, account: string}>
@@ -21,7 +27,7 @@ interface AuthorizationHook {
   (arg: {event: H3Event, permKey: string}): Promise<boolean>
 }
 
-interface AuthServerConfig<Token = any, UserSessionData = any> {
+interface AuthServerConfig<Token = any, UserSessionData extends BaseUserSessionData = BaseUserSessionData> {
   /**
    * 认证
    */
@@ -40,7 +46,7 @@ let authServer: ReturnType<typeof useAuthServer<any, any>>
 /**
  * 内部使用，用于获取 {@link useAuthServer} 执行后的结果并使用
  */
-export function _useAuthServer<Token = any, UserSessionData = any>(): ReturnType<typeof useAuthServer<Token, UserSessionData>> {
+export function _useAuthServer<Token = any, UserSessionData extends BaseUserSessionData = BaseUserSessionData>(): ReturnType<typeof useAuthServer<Token, UserSessionData>> {
   return authServer
 }
 
@@ -49,7 +55,7 @@ export function _useAuthServer<Token = any, UserSessionData = any>(): ReturnType
  * **全局只能执行一次**，多次执行可能会导致之前配置都不生效。
  * @param param0 AuthServerConfig
  */
-export function useAuthServer<Token = any, UserSessionData = any>({
+export function useAuthServer<Token = any, UserSessionData extends BaseUserSessionData = BaseUserSessionData>({
   authenticationHook,
   authorizationHook,
 }: AuthServerConfig<Token, UserSessionData>){
