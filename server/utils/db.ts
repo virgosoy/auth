@@ -50,7 +50,7 @@ interface UserDb {
   updateUserById(updates: Partial<User>): Promise<void>
 }
 
-const wrapper = new Proxy({} as UserDb, {
+const userDbWrapper = new Proxy({} as UserDb, {
   get(target, p, receiver) {
     // @ts-ignore
     return (...args) => userDb[p](...args)
@@ -63,5 +63,5 @@ export function defineUserDb(userDb_: UserDb){
   userDb = userDb_
 }
 
-export const { listUser, findUserByAccount, createUser, updateUserByAccount, updateUserById } = wrapper
+export const { listUser, findUserByAccount, createUser, updateUserByAccount, updateUserById } = userDbWrapper
 
