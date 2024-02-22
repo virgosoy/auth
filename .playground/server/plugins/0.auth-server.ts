@@ -47,6 +47,25 @@ export default defineNitroPlugin((nirtoApp) => {
         account: user.account,
       }
     },
+    async changeCredential(identity, changeCredentialInfo: {oldPassword: string, newPassword: string}) {
+      const user = await findUserByAccount(identity.account)
+      if(!user){
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'User not exists!',
+        })
+      }
+      if(user.password !== await hash(changeCredentialInfo.oldPassword)){
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'Incorrect old password!',
+        })
+      }
+      updateUserById({
+        id: user.id,
+        password: await hash(changeCredentialInfo.newPassword),
+      })
+    },
   })
 
     
@@ -110,25 +129,6 @@ export default defineNitroPlugin((nirtoApp) => {
     findUserByAccount,
     createUser,
     updateUserById,
-    async changeUserCredential(identity: {account: string}, oldCredential: string, newCredential: string) {
-      const user = await findUserByAccount(identity.account)
-      if(!user){
-        throw createError({
-          statusCode: 401,
-          statusMessage: 'User not exists!',
-        })
-      }
-      if(user.password !== await hash(oldCredential)){
-        throw createError({
-          statusCode: 401,
-          statusMessage: 'Incorrect old password!',
-        })
-      }
-      updateUserById({
-        id: user.id,
-        password: await hash(newCredential),
-      })
-    },
     userForFrontEnd(user){
       const { password, ...result } = user
       return result

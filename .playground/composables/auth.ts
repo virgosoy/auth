@@ -6,7 +6,8 @@
 export const useMyAuth = useAuthClient<
   {account: string, password: string}, 
   any, 
-  {account: string, password: string}
+  {account: string, password: string},
+  {oldPassword: string, newPassword: string}
 >
 
 /**

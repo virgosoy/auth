@@ -1,4 +1,4 @@
-import type { BaseRegistrationInfo, BaseToken, BaseUserIdentity } from "../server/utils/auth-core";
+import type { BaseChangeCredentialInfo, BaseRegistrationInfo, BaseToken, BaseUserIdentity } from "../server/utils/auth-core";
 
 export const useAuth = () => useNuxtApp().$auth
 
@@ -46,19 +46,32 @@ async function register<RegistrationInfo extends BaseRegistrationInfo>(registrat
   await _postLogin()
 }
 
+/**
+ * 修改证明（即密码）
+ * @param changeCredentialInfo -
+ */
+async function changeCredential<ChangeCredentialInfo extends BaseChangeCredentialInfo>(changeCredentialInfo: ChangeCredentialInfo) {
+  await $fetch("/api/auth/my/change-credential", {
+    method: "POST",
+    body: changeCredentialInfo,
+  })
+  await useAuth().refreshSession();
+}
 
 /**
  * 使用 auth 客户端
  */
 export function useAuthClient<
   Token extends BaseToken = BaseToken, 
-  UserSessionData extends BaseUserIdentity = BaseUserIdentity,
-  RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo
+  UserIdentity extends BaseUserIdentity = BaseUserIdentity,
+  RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
+  ChangeCredentialInfo extends BaseChangeCredentialInfo = BaseChangeCredentialInfo,
 >() {
   return {
     login: login<Token>,
     logout,
     register: register<RegistrationInfo>,
+    changeCredential: changeCredential<ChangeCredentialInfo>,
   }
 }
 

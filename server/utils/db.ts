@@ -2,7 +2,6 @@
 // @ts-ignore: js 是正常的，ts 不正常，相关见：https://nitro.unjs.io/guide/auto-imports#manual-imports
 // import { useStorage as _useStorage } from '#imports';
 import type { Storage, StorageValue } from 'unstorage'
-import type { BaseUserIdentity } from './auth-core';
 
 /** 重写 useStorage 给予默认 key */
 // const useStorage = <T extends StorageValue>(): Storage<T> => _useStorage<T>('auth')
@@ -22,11 +21,6 @@ export interface User {
 }
 
 /**
- * 用户身份证明（凭证），密码
- */
-export type BaseUserCredential = {}
-
-/**
  * 用户账号
  * 和 {@link BaseUserIdentity} 类似，但不一定一致，前者方便用户输入，后者可以存储账号，也可以存储整个对象，都是可以确定用户的唯一。
  */
@@ -36,8 +30,6 @@ interface UserDb<
   UserT extends Record<string, any> = Record<string, any>, 
   UserForFrontEndT extends Record<string, any> = Record<string, any>,
   UserAccountT extends BaseUserAccount = BaseUserAccount,
-  UserIdentityT extends BaseUserIdentity = BaseUserIdentity,
-  UserCredentialT extends BaseUserCredential = BaseUserCredential,
 > {
   /**
    * 列出所有账号
@@ -66,15 +58,6 @@ interface UserDb<
    * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
    */
   updateUserById(updates: Partial<UserT>): Promise<void>
-
-  /**
-   * 修改用户证明（密码）
-   * @param identity -
-   * @param oldCredential -
-   * @param newCredential -
-   */
-  changeUserCredential(identity: UserIdentityT, oldCredential: UserCredentialT, newCredential: UserCredentialT): Promise<void>
-
   /**
    * 给前端展示的用户，去除敏感信息，如密码
    * @param user -
@@ -87,9 +70,8 @@ let userDb: UserDb
 export function defineUserDb<
   UserT extends Record<string, any> = Record<string, any>, 
   UserForFrontEndT extends Record<string, any> = Record<string, any>,
-  UserIdentityT extends BaseUserIdentity = BaseUserIdentity,
-  UserCredentialT extends BaseUserCredential = BaseUserCredential,
->(userDb_: UserDb<UserT, UserForFrontEndT, UserIdentityT, UserCredentialT>){
+  UserAccountT extends BaseUserAccount = BaseUserAccount,
+>(userDb_: UserDb<UserT, UserForFrontEndT, UserAccountT>){
   userDb = userDb_
 }
 

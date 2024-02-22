@@ -21,6 +21,11 @@ export type BaseToken = {}
 export type BaseRegistrationInfo = Record<string, any>
 
 /**
+ * 修改证明（密码）的信息 的基类
+ */
+export type BaseChangeCredentialInfo = Record<string, any>
+
+/**
  * 认证（登录）
  * @template UserIdentity 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，来确认当前用户是谁，后续会根据这个判断用户是否认证
  */
@@ -53,6 +58,7 @@ interface AuthServerConfig<
   Token extends BaseToken = BaseToken, 
   UserIdentity extends BaseUserIdentity = BaseUserIdentity,
   RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
+  ChangeCredentialInfo extends BaseChangeCredentialInfo = BaseChangeCredentialInfo,
 > {
   /**
    * 认证
@@ -64,18 +70,25 @@ interface AuthServerConfig<
   authorizationHook: AuthorizationHook,
   /**
    * 注册，和 {@link createUser} 类似，但是是面向用户的 \
-   * 非必须，因为并不是所有系统都需要注册
+   * 非必须，因为并不是所有业务都需要在此系统注册
    * @param registrationInfo 
    * @returns UserIdentity
    * @implements 实现的时候建议底层调用 {@link createUser}
    */
-  register?: (registrationInfo: RegistrationInfo) => Promise<UserIdentity>
+  register?: (registrationInfo: RegistrationInfo) => Promise<UserIdentity>,
+  /**
+   * 修改用户证明（密码） \
+   * 非必须，因为并不是所有业务都要在此系统改密码。
+   * @param identity -
+   * @param changeCredentialInfo -
+   */
+  changeCredential?: (identity: UserIdentity, changeCredentialInfo: ChangeCredentialInfo) => Promise<void>
 }
 
 /**
  * 存放 {@link useAuthServer} 的执行结果，给内部的 {@link _useAuthServer} 返回。
  */
-let authServer: ReturnType<typeof useAuthServer<any, any, any>>
+let authServer: ReturnType<typeof useAuthServer<any, any, any, any>>
 
 /**
  * 内部使用，用于获取 {@link useAuthServer} 执行后的结果并使用
@@ -84,7 +97,8 @@ export function _useAuthServer<
   Token extends BaseToken = BaseToken, 
   UserIdentity extends BaseUserIdentity = BaseUserIdentity,
   RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
->(): ReturnType<typeof useAuthServer<Token, UserIdentity, RegistrationInfo>> {
+  ChangeCredentialInfo extends BaseChangeCredentialInfo = BaseChangeCredentialInfo,
+>(): ReturnType<typeof useAuthServer<Token, UserIdentity, RegistrationInfo, ChangeCredentialInfo>> {
   return authServer
 }
 
@@ -97,11 +111,13 @@ export function useAuthServer<
   Token extends BaseToken = BaseToken,
   UserIdentity extends BaseUserIdentity = BaseUserIdentity,
   RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
+  ChangeCredentialInfo extends BaseChangeCredentialInfo = BaseChangeCredentialInfo,
 >({
   authenticationHook,
   authorizationHook,
   register,
-}: AuthServerConfig<Token, UserIdentity, RegistrationInfo>){
+  changeCredential,
+}: AuthServerConfig<Token, UserIdentity, RegistrationInfo, ChangeCredentialInfo>){
 
   /**
    * 登录
@@ -160,6 +176,7 @@ export function useAuthServer<
     logout,
     hasAuth,
     register,
+    changeCredential,
   }
   authServer = result
   return result

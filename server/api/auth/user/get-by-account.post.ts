@@ -1,9 +1,8 @@
-import type { BaseUserIdentity } from "../../../utils/auth-core"
 import { useUserDb } from "../../../utils/db"
 
 export default defineEventHandler(async (event) => {
-  const { account } = await readBody<{account: BaseUserIdentity}>(event)
-  const { findUserByAccount: findUserByIdentity, userForFrontEnd } = useUserDb()
-  const user = await findUserByIdentity(account)
+  const { account } = await readBody<{account: BaseUserAccount}>(event)
+  const { findUserByAccount, userForFrontEnd } = useUserDb()
+  const user = await findUserByAccount(account)
   return user && userForFrontEnd(user)
 })
