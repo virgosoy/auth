@@ -118,18 +118,18 @@ export function useAuthServer<
         statusMessage: 'Authentication failed!',
       })
     }
-    await loginByUserSessionData(event, sessionData)
+    await loginByUserIdentity(event, sessionData)
   }
 
   /**
-   * 通过 userSessionData 登录
+   * 通过 userIdentity 登录
    * @param event H3Event
-   * @param userSessionData -
+   * @param userIdentity -
    */
-  async function loginByUserSessionData(event: H3Event, userSessionData: UserIdentity){
+  async function loginByUserIdentity(event: H3Event, userIdentity: UserIdentity){
     const session = await useAuthSession<UserIdentity>(event)
     await session.update({
-      user: userSessionData,
+      user: userIdentity,
     })
   }
 
@@ -156,7 +156,7 @@ export function useAuthServer<
 
   const result = {
     login,
-    loginByUserSessionData,
+    loginByUserIdentity,
     logout,
     hasAuth,
     register,

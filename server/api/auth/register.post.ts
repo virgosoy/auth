@@ -8,11 +8,11 @@ export default eventHandler(async (event) => {
   if(!canRegister){
     throw create404Error(event);
   }
-  const { register, loginByUserSessionData } = _useAuthServer()
+  const { register, loginByUserIdentity } = _useAuthServer()
   const body = await readBody(event);
   const userSessionData = await register!(body)
   // 设置认证（即登录态）
-  await loginByUserSessionData(event, userSessionData)
+  await loginByUserIdentity(event, userSessionData)
   return {
     message: "Successfully registered!",
   };
