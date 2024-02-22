@@ -9,6 +9,11 @@ import { throw500Error } from './shared'
 export type BaseUserSessionData = {}
 
 /**
+ * 基础的注册信息
+ */
+export type BaseRegistrationInfo = Record<string, any>
+
+/**
  * 认证（登录）
  * @template UserSessionData 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，来确认当前用户是谁，后续会根据这个判断用户是否认证
  */
@@ -34,7 +39,11 @@ interface AuthorizationHook {
   (arg: {event: H3Event, permKey: string}): Promise<boolean>
 }
 
-interface AuthServerConfig<Token = any, UserSessionData extends BaseUserSessionData = BaseUserSessionData> {
+interface AuthServerConfig<
+  Token = any, 
+  UserSessionData extends BaseUserSessionData = BaseUserSessionData,
+  RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
+> {
   /**
    * 认证
    */
@@ -42,18 +51,30 @@ interface AuthServerConfig<Token = any, UserSessionData extends BaseUserSessionD
   /**
    * 授权
    */
-  authorizationHook: AuthorizationHook
+  authorizationHook: AuthorizationHook,
+  /**
+   * 注册，和 {@link createUser} 类似，但是是面向用户的 \
+   * 非必须，因为并不是所有系统都需要注册
+   * @param registrationInfo 
+   * @returns UserSessionData
+   * @implements 实现的时候建议底层调用 {@link createUser}
+   */
+  register?: (registrationInfo: RegistrationInfo) => Promise<UserSessionData>
 }
 
 /**
  * 存放 {@link useAuthServer} 的执行结果，给内部的 {@link _useAuthServer} 返回。
  */
-let authServer: ReturnType<typeof useAuthServer<any, any>>
+let authServer: ReturnType<typeof useAuthServer<any, any, any>>
 
 /**
  * 内部使用，用于获取 {@link useAuthServer} 执行后的结果并使用
  */
-export function _useAuthServer<Token = any, UserSessionData extends BaseUserSessionData = BaseUserSessionData>(): ReturnType<typeof useAuthServer<Token, UserSessionData>> {
+export function _useAuthServer<
+  Token = any, 
+  UserSessionData extends BaseUserSessionData = BaseUserSessionData,
+  RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
+>(): ReturnType<typeof useAuthServer<Token, UserSessionData, RegistrationInfo>> {
   return authServer
 }
 
@@ -62,10 +83,15 @@ export function _useAuthServer<Token = any, UserSessionData extends BaseUserSess
  * **全局只能执行一次**，多次执行可能会导致之前配置都不生效。
  * @param param0 AuthServerConfig
  */
-export function useAuthServer<Token = any, UserSessionData extends BaseUserSessionData = BaseUserSessionData>({
+export function useAuthServer<
+  Token = any,
+  UserSessionData extends BaseUserSessionData = BaseUserSessionData,
+  RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
+>({
   authenticationHook,
   authorizationHook,
-}: AuthServerConfig<Token, UserSessionData>){
+  register,
+}: AuthServerConfig<Token, UserSessionData, RegistrationInfo>){
 
   /**
    * 登录
@@ -82,9 +108,18 @@ export function useAuthServer<Token = any, UserSessionData extends BaseUserSessi
         statusMessage: 'Authentication failed!',
       })
     }
+    await loginByUserSessionData(event, sessionData)
+  }
+
+  /**
+   * 通过 userSessionData 登录
+   * @param event H3Event
+   * @param userSessionData -
+   */
+  async function loginByUserSessionData(event: H3Event, userSessionData: UserSessionData){
     const session = await useAuthSession<UserSessionData>(event)
     await session.update({
-      user: sessionData,
+      user: userSessionData,
     })
   }
 
@@ -111,8 +146,10 @@ export function useAuthServer<Token = any, UserSessionData extends BaseUserSessi
 
   const result = {
     login,
+    loginByUserSessionData,
     logout,
     hasAuth,
+    register,
   }
   authServer = result
   return result

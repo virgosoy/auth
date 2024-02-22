@@ -35,8 +35,7 @@ const onError = (err: any) => {
   })
 }
 
-const { login } = useMyAuth()
-const { register } = useMyUser()
+const { login, register } = useMyAuth()
 </script>
 
 <template>

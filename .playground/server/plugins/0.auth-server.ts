@@ -12,7 +12,6 @@ export default defineNitroPlugin((nirtoApp) => {
   useAuthServer({
     // 应该按实际业务去编写 AuthenticationHook 接口的签名
     authenticationHook: async ({account, password} : {account: string, password: string}) => {
-      const { findUserByAccount } = useUserDb()
       const user = await findUserByAccount(account)
       if(!user){
         throw createError({
@@ -34,6 +33,19 @@ export default defineNitroPlugin((nirtoApp) => {
     },
     authorizationHook: async ({event, permKey}) => {
       return true
+    },
+    async register(registrationInfo: {account: string, password: string}) {
+      await createUser({
+        account: registrationInfo.account,
+        name: registrationInfo.account.split('@')[0],
+        password: await hash(registrationInfo.password)
+      });
+      const user = (await findUserByAccount(registrationInfo.account))!
+      return {
+        id: user.id,
+        name: user.name,
+        account: user.account,
+      }
     },
   })
 
@@ -74,13 +86,6 @@ export default defineNitroPlugin((nirtoApp) => {
     },
     findUserByAccount,
     createUser,
-    async register(registrationInfo: {account: string, password: string}) {
-      await createUser({
-        account: registrationInfo.account,
-        name: registrationInfo.account.split('@')[0],
-        password: await hash(registrationInfo.password)
-      });
-    },
     async updateUserByAccount(account: string, updates: Partial<User>) {
       const storage = useStorage();
       const user = await findUserByAccount(account);

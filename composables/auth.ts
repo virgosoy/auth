@@ -1,6 +1,15 @@
-import type { BaseUserSessionData } from "../server/utils/auth-core";
+import type { BaseRegistrationInfo, BaseUserSessionData } from "../server/utils/auth-core";
 
 export const useAuth = () => useNuxtApp().$auth
+
+/**
+ * 内部使用，用于服务端登录后刷新客户端 session 和重定向
+ */
+async function _postLogin(){
+  useAuth().redirectTo.value = null;
+  await useAuth().refreshSession();
+  await navigateTo(useAuth().redirectTo.value || "/");
+}
 
 /**
  * 登录 \
@@ -12,9 +21,7 @@ async function login<Token extends {} = {}>(token: Token){
     method: "POST",
     body: token,
   });
-  useAuth().redirectTo.value = null;
-  await useAuth().refreshSession();
-  await navigateTo(useAuth().redirectTo.value || "/");
+  await _postLogin()
 }
 
 /**
@@ -28,12 +35,30 @@ async function logout() {
 }
 
 /**
+ * 注册并登录
+ * @param registrationInfo 注册信息
+ */
+async function register<RegistrationInfoT extends BaseRegistrationInfo>(registrationInfo: RegistrationInfoT){
+  await $fetch("/api/auth/register", {
+    method: "POST",
+    body: registrationInfo,
+  });
+  await _postLogin()
+}
+
+
+/**
  * 使用 auth 客户端
  */
-export function useAuthClient<Token extends {} = {}, UserSessionData extends BaseUserSessionData = BaseUserSessionData>() {
+export function useAuthClient<
+  Token extends {} = {}, 
+  UserSessionDataT extends BaseUserSessionData = BaseUserSessionData,
+  RegistrationInfoT extends BaseRegistrationInfo = BaseRegistrationInfo
+>() {
   return {
     login: login<Token>,
     logout,
+    register: register<RegistrationInfoT>,
   }
 }
 
