@@ -3,10 +3,15 @@ import { throw500Error } from './shared'
 
 
 /**
- * 基础的 session 用户数据（一般是 PrimaryPrincipal），是实际用户数据的基类 \
+ * 基础的 session 用户身份（一般是 PrimaryPrincipal），是实际用户身份的基类 \
  * 必须要有，来确认当前用户是谁。
  */
-export type BaseUserSessionData = {}
+export type BaseUserIdentity = {}
+
+/**
+ * 基础的登录令牌，登录时的参数
+ */
+export type BaseToken = {}
 
 /**
  * 基础的注册信息
@@ -15,15 +20,18 @@ export type BaseRegistrationInfo = Record<string, any>
 
 /**
  * 认证（登录）
- * @template UserSessionData 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，来确认当前用户是谁，后续会根据这个判断用户是否认证
+ * @template UserIdentity 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，来确认当前用户是谁，后续会根据这个判断用户是否认证
  */
-interface AuthenticationHook<Token = any, UserSessionData extends BaseUserSessionData = BaseUserSessionData> {
+interface AuthenticationHook<
+  Token extends BaseToken = BaseToken,
+  UserIdentity extends BaseUserIdentity = BaseUserIdentity
+> {
   /**
    * 认证
    * @param token 登录附加参数
    * @returns 要存放到 session 的用户数据（一般是 PrimaryPrincipal），必须要有，后续会根据这个判断用户是否认证
    */
-  (token: Token): Promise<UserSessionData>
+  (token: Token): Promise<UserIdentity>
   // (token: {account: string, password: string}): Promise<{id: number, account: string}>
 }
 /**
@@ -40,14 +48,14 @@ interface AuthorizationHook {
 }
 
 interface AuthServerConfig<
-  Token = any, 
-  UserSessionData extends BaseUserSessionData = BaseUserSessionData,
+  Token extends BaseToken = BaseToken, 
+  UserIdentity extends BaseUserIdentity = BaseUserIdentity,
   RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
 > {
   /**
    * 认证
    */
-  authenticationHook: AuthenticationHook<Token, UserSessionData>
+  authenticationHook: AuthenticationHook<Token, UserIdentity>
   /**
    * 授权
    */
@@ -56,10 +64,10 @@ interface AuthServerConfig<
    * 注册，和 {@link createUser} 类似，但是是面向用户的 \
    * 非必须，因为并不是所有系统都需要注册
    * @param registrationInfo 
-   * @returns UserSessionData
+   * @returns UserIdentity
    * @implements 实现的时候建议底层调用 {@link createUser}
    */
-  register?: (registrationInfo: RegistrationInfo) => Promise<UserSessionData>
+  register?: (registrationInfo: RegistrationInfo) => Promise<UserIdentity>
 }
 
 /**
@@ -71,10 +79,10 @@ let authServer: ReturnType<typeof useAuthServer<any, any, any>>
  * 内部使用，用于获取 {@link useAuthServer} 执行后的结果并使用
  */
 export function _useAuthServer<
-  Token = any, 
-  UserSessionData extends BaseUserSessionData = BaseUserSessionData,
+  Token extends BaseToken = BaseToken, 
+  UserIdentity extends BaseUserIdentity = BaseUserIdentity,
   RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
->(): ReturnType<typeof useAuthServer<Token, UserSessionData, RegistrationInfo>> {
+>(): ReturnType<typeof useAuthServer<Token, UserIdentity, RegistrationInfo>> {
   return authServer
 }
 
@@ -84,14 +92,14 @@ export function _useAuthServer<
  * @param param0 AuthServerConfig
  */
 export function useAuthServer<
-  Token = any,
-  UserSessionData extends BaseUserSessionData = BaseUserSessionData,
+  Token extends BaseToken = BaseToken,
+  UserIdentity extends BaseUserIdentity = BaseUserIdentity,
   RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
 >({
   authenticationHook,
   authorizationHook,
   register,
-}: AuthServerConfig<Token, UserSessionData, RegistrationInfo>){
+}: AuthServerConfig<Token, UserIdentity, RegistrationInfo>){
 
   /**
    * 登录
@@ -116,8 +124,8 @@ export function useAuthServer<
    * @param event H3Event
    * @param userSessionData -
    */
-  async function loginByUserSessionData(event: H3Event, userSessionData: UserSessionData){
-    const session = await useAuthSession<UserSessionData>(event)
+  async function loginByUserSessionData(event: H3Event, userSessionData: UserIdentity){
+    const session = await useAuthSession<UserIdentity>(event)
     await session.update({
       user: userSessionData,
     })
@@ -128,7 +136,7 @@ export function useAuthServer<
    * @param event H3Event
    */
   async function logout(event: H3Event) {
-    const session = await useAuthSession<UserSessionData>(event)
+    const session = await useAuthSession<UserIdentity>(event)
     await session.clear();
     // 其实只要清掉 session.data.user 即可。
   }

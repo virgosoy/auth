@@ -1,4 +1,4 @@
-import type { BaseRegistrationInfo, BaseUserSessionData } from "../server/utils/auth-core";
+import type { BaseRegistrationInfo, BaseToken, BaseUserIdentity } from "../server/utils/auth-core";
 
 export const useAuth = () => useNuxtApp().$auth
 
@@ -16,7 +16,7 @@ async function _postLogin(){
  * 错误时返回 reject
  * @param token -
  */
-async function login<Token extends {} = {}>(token: Token){
+async function login<Token extends BaseToken = BaseToken>(token: Token){
   await $fetch("/api/auth/login", {
     method: "POST",
     body: token,
@@ -38,7 +38,7 @@ async function logout() {
  * 注册并登录
  * @param registrationInfo 注册信息
  */
-async function register<RegistrationInfoT extends BaseRegistrationInfo>(registrationInfo: RegistrationInfoT){
+async function register<RegistrationInfo extends BaseRegistrationInfo>(registrationInfo: RegistrationInfo){
   await $fetch("/api/auth/register", {
     method: "POST",
     body: registrationInfo,
@@ -51,14 +51,14 @@ async function register<RegistrationInfoT extends BaseRegistrationInfo>(registra
  * 使用 auth 客户端
  */
 export function useAuthClient<
-  Token extends {} = {}, 
-  UserSessionDataT extends BaseUserSessionData = BaseUserSessionData,
-  RegistrationInfoT extends BaseRegistrationInfo = BaseRegistrationInfo
+  Token extends BaseToken = BaseToken, 
+  UserSessionData extends BaseUserIdentity = BaseUserIdentity,
+  RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo
 >() {
   return {
     login: login<Token>,
     logout,
-    register: register<RegistrationInfoT>,
+    register: register<RegistrationInfo>,
   }
 }
 
