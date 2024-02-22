@@ -13,10 +13,8 @@ export type UserForCreate = {
 
 export default defineEventHandler(async (event) => {
   // 请求体
-  const { account, password } = await readBody<UserForCreate>(event)
+  const body = await readBody(event)
   
   const { createUser } = useUserDb()
-  await createUser({
-    account, password: await hash(password)
-  })
+  await createUser(body)
 })

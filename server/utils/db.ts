@@ -42,7 +42,9 @@ interface UserDb<
   findUserByAccount(account: UserAccountT): Promise<UserT | null>
   /**
    * 创建用户
-   * @param user.password 是经过 hash 的，可以使用 await hash(password) 生成 
+   * @param user 密码是否加密取决于实现，user 与前端请求后端接收的参数一致。 \ 
+   * 可以在前端加密后传输，也可以在后端加密。甚至双端都加密。 \
+   * 如需加密可以使用 await hash(password) 生成 
    */
   createUser(user: Partial<UserT>): Promise<void>
   // /**
@@ -53,11 +55,12 @@ interface UserDb<
   //  */
   // updateUserByIdentity(identity: UserIdentityT, updates: Partial<UserT>): Promise<void>
   /**
-   * 根据 id 更新用户
-   * @param updates 
-   * @param updates.password 是经过 hash 的，可以使用 await hash(password) 生成 
+   * 更新用户，以什么做主键取决于实现，但一般建议 id 做主键。
+   * @param updates 用户对象，密码是否经过加密取决于实现。\
+   * 此对象与前端请求后端参数一致。 \
+   * 如需加密，可以使用 await hash(password) 生成 
    */
-  updateUserById(updates: Partial<UserT>): Promise<void>
+  updateUser(updates: Partial<UserT>): Promise<void>
   /**
    * 给前端展示的用户，去除敏感信息，如密码
    * @param user -

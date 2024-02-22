@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     })
   }
   const { changeCredential } = _useAuthServer()
-  await changeCredential(session.data.user, body)
+  await changeCredential!(session.data.user, body)
   return {
     message: "Successfully change password!",
   }

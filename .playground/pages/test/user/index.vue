@@ -3,41 +3,33 @@ import type { User } from '../../../../server/utils/db';
 
 const accounts = ref<Omit<User, 'password'>[]>([])
 async function listUser() {
-  const res = await $fetch('/api/auth/user/list')
+  const { listUser } = useMyUser()
+  const res = await listUser()
   accounts.value = res
 }
 
 const account = ref('')
 const user = ref<Omit<User, 'password'>>()
 async function getByAccount() {
-  const res = await $fetch('/api/auth/user/get-by-account', {
-    query: {
-      account: account.value
-    }
-  })
+  const { findUserByAccount } = useMyUser()
+  const res = await findUserByAccount(account.value)
   console.log({res})
   user.value = res
 }
 
 const password = ref('')
 async function addUser() {
-  await $fetch('/api/auth/user/add', {
-    method: 'POST',
-    body: {
-      account: account.value,
-      password: password.value
-    }
+  await useMyUser().createUser({
+    account: account.value,
+    password: password.value,
   })
 }
 
 async function updateUser() {
-  await $fetch('/api/auth/user', {
-    method: 'PUT',
-    body: {
-      id: user!.value!.id,
-      account: account.value,
-      ...password.value && {password: password.value}
-    }
+  await useMyUser().updateUser({
+    id: user!.value!.id,
+    account: account.value,
+    ...password.value && {password: password.value}
   })
 }
 </script>

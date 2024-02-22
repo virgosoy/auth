@@ -38,7 +38,7 @@ export default defineNitroPlugin((nirtoApp) => {
       await createUser({
         account: registrationInfo.account,
         name: registrationInfo.account.split('@')[0],
-        password: await hash(registrationInfo.password)
+        password: registrationInfo.password
       });
       const user = (await findUserByAccount(registrationInfo.account))!
       return {
@@ -61,9 +61,9 @@ export default defineNitroPlugin((nirtoApp) => {
           statusMessage: 'Incorrect old password!',
         })
       }
-      updateUserById({
+      updateUser({
         id: user.id,
-        password: await hash(changeCredentialInfo.newPassword),
+        password: changeCredentialInfo.newPassword,
       })
     },
   })
@@ -84,6 +84,7 @@ export default defineNitroPlugin((nirtoApp) => {
     return await storage.getItem(key);
   }
   async function createUser(user: Partial<User>) {
+    user.password = await hash(user.password!)
     const storage = useStorage();
     const key = getUserKey(user.account!);
     if (await storage.hasItem(key)) {
@@ -95,8 +96,10 @@ export default defineNitroPlugin((nirtoApp) => {
     });
   }
   
-  async function updateUserById(updates: Partial<User>) {
-    
+  async function updateUser(updates: Partial<User>) {
+    if(updates.password !== undefined){
+      updates.password = await hash(updates.password)
+    }
     const storage = useStorage()
     const keys = await storage.getKeys(KEY_PREFIX);
     const items = await storage.getItems(keys)
@@ -128,7 +131,7 @@ export default defineNitroPlugin((nirtoApp) => {
     },
     findUserByAccount,
     createUser,
-    updateUserById,
+    updateUser,
     userForFrontEnd(user){
       const { password, ...result } = user
       return result

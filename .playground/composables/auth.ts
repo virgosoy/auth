@@ -1,3 +1,4 @@
+import type { User } from "../../server/utils/db"
 
 
 /**
@@ -13,4 +14,8 @@ export const useMyAuth = useAuthClient<
 /**
  * 自定义使用用户，固定了泛型
  */
-export const useMyUser = useUser
+export const useMyUser = useUser<
+  User,
+  Omit<User, 'password'>,
+  string
+>
