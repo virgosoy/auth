@@ -3,8 +3,10 @@ import { throw500Error } from './shared'
 
 
 /**
- * 基础的 session 用户身份（一般是 PrimaryPrincipal），是实际用户身份的基类 \
- * 必须要有，来确认当前用户是谁。
+ * 基础的 session 用户身份（PrimaryPrincipal），如账号，或者整个用户对象，是实际用户身份的基类 \
+ * 必须要有，来确认当前用户是谁。 \
+ * 可以修改（例如改账号），但在所有用户中唯一。 \
+ * 和 {@link BaseUserAccount} 类似，但后者方便用户输入，一般只有账号。
  */
 export type BaseUserIdentity = {}
 

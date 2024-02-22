@@ -76,6 +76,29 @@ export default defineNitroPlugin((nirtoApp) => {
     });
   }
   
+  async function updateUserById(updates: Partial<User>) {
+    
+    const storage = useStorage()
+    const keys = await storage.getKeys(KEY_PREFIX);
+    const items = await storage.getItems(keys)
+    const item = items.find(item => (item.value as User).id === updates.id)
+    
+    if (!item) {
+      throw createError({ message: 'User not found!', statusCode: 404 });
+    }
+    
+    const key = item.key
+    const user = item.value as User
+    const newKey = getUserKey(updates.account ?? user.account)
+    if(newKey !== key){
+      await storage.removeItem(key)
+    }
+    return await storage.setItem(newKey, {
+        ...user,
+        ...updates,
+    });
+  }
+  
   defineUserDb({
     async listUser() {
       const storage = useStorage()
@@ -86,39 +109,25 @@ export default defineNitroPlugin((nirtoApp) => {
     },
     findUserByAccount,
     createUser,
-    async updateUserByAccount(account: string, updates: Partial<User>) {
-      const storage = useStorage();
-      const user = await findUserByAccount(account);
-      if (!user) {
-        throw createError({ message: 'User not found!', statusCode: 404 });
+    updateUserById,
+    async changeUserCredential(identity: {account: string}, oldCredential: string, newCredential: string) {
+      const user = await findUserByAccount(identity.account)
+      if(!user){
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'User not exists!',
+        })
       }
-      const key = getUserKey(user.account!);
-      return await storage.setItem(key, {
-          ...user,
-          ...updates,
-      });
-    },
-    async updateUserById(updates: Partial<User>) {
-    
-      const storage = useStorage()
-      const keys = await storage.getKeys(KEY_PREFIX);
-      const items = await storage.getItems(keys)
-      const item = items.find(item => (item.value as User).id === updates.id)
-      
-      if (!item) {
-        throw createError({ message: 'User not found!', statusCode: 404 });
+      if(user.password !== await hash(oldCredential)){
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'Incorrect old password!',
+        })
       }
-      
-      const key = item.key
-      const user = item.value as User
-      const newKey = getUserKey(updates.account ?? user.account)
-      if(newKey !== key){
-        await storage.removeItem(key)
-      }
-      return await storage.setItem(newKey, {
-          ...user,
-          ...updates,
-      });
+      updateUserById({
+        id: user.id,
+        password: await hash(newCredential),
+      })
     },
     userForFrontEnd(user){
       const { password, ...result } = user
