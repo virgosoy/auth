@@ -1,6 +1,10 @@
 import type { AuthSession } from "../server/utils/session";
 
+console.info('Load Module - auth')
+
 export default defineNuxtPlugin(async (nuxtApp) => {
+  console.info('Nuxt Plugin - auth')
+
   // Skip plugin when rendering error page
   if (nuxtApp.payload.error) {
     return {};

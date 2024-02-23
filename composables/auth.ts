@@ -1,14 +1,15 @@
 import type { BaseChangeCredentialInfo, BaseRegistrationInfo, BaseToken, BaseUserIdentity } from "../server/utils/auth-core";
+import type { AuthSession } from "../server/utils/session";
 
-export const useAuth = () => useNuxtApp().$auth
-
+console.log('Load Module - composables/auth.ts')
 /**
  * 内部使用，用于服务端登录后刷新客户端 session 和重定向
  */
 async function _postLogin(){
-  useAuth().redirectTo.value = null;
-  await useAuth().refreshSession();
-  await navigateTo(useAuth().redirectTo.value || "/");
+  const { $auth } = useAuthClient()
+  $auth.redirectTo.value = null;
+  await $auth.refreshSession();
+  await navigateTo($auth.redirectTo.value || "/");
 }
 
 /**
@@ -31,7 +32,8 @@ async function logout() {
   await $fetch("/api/auth/logout", {
     method: "POST",
   });
-  await useAuth().refreshSession();
+  const { $auth } = useAuthClient()
+  await $auth.refreshSession();
 }
 
 /**
@@ -55,7 +57,8 @@ async function changeCredential<ChangeCredentialInfo extends BaseChangeCredentia
     method: "POST",
     body: changeCredentialInfo,
   })
-  await useAuth().refreshSession();
+  const { $auth } = useAuthClient()
+  await $auth.refreshSession();
 }
 
 /**
@@ -72,6 +75,11 @@ export function useAuthClient<
     logout,
     register: register<RegistrationInfo>,
     changeCredential: changeCredential<ChangeCredentialInfo>,
+    get $auth() {
+      // 虽然也可以通过 .d.ts 类型化 $auth，但是对用户来说比较麻烦。
+      const result = useNuxtApp().$auth 
+      return result as ({sessionData: Ref<AuthSession<UserIdentity> | null>} & Omit<typeof result, 'sessionData'>)
+    }
   }
 }
 

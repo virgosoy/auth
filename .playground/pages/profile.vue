@@ -8,7 +8,7 @@ definePageMeta({
 });
 
 const { data: session } = await useFetch("/api/auth/session", { headers: useRequestHeaders(['cookie'])});
-const { logout } = useMyAuth()
+const { logout, $auth } = useMyAuth()
 </script>
 
 <template>
