@@ -86,19 +86,19 @@ interface AuthServerConfig<
 }
 
 /**
- * 存放 {@link useAuthServer} 的执行结果，给内部的 {@link _useAuthServer} 返回。
+ * 存放 {@link defineAuthServer} 的执行结果，给内部的 {@link _useAuthServer} 返回。
  */
-let authServer: ReturnType<typeof useAuthServer<any, any, any, any>>
+let authServer: ReturnType<typeof defineAuthServer<any, any, any, any>>
 
 /**
- * 内部使用，用于获取 {@link useAuthServer} 执行后的结果并使用
+ * 内部使用，用于获取 {@link defineAuthServer} 执行后的结果并使用
  */
 export function _useAuthServer<
   Token extends BaseToken = BaseToken, 
   UserIdentity extends BaseUserIdentity = BaseUserIdentity,
   RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,
   ChangeCredentialInfo extends BaseChangeCredentialInfo = BaseChangeCredentialInfo,
->(): ReturnType<typeof useAuthServer<Token, UserIdentity, RegistrationInfo, ChangeCredentialInfo>> {
+>(): ReturnType<typeof defineAuthServer<Token, UserIdentity, RegistrationInfo, ChangeCredentialInfo>> {
   return authServer
 }
 
@@ -107,7 +107,7 @@ export function _useAuthServer<
  * **全局只能执行一次**，多次执行可能会导致之前配置都不生效。
  * @param param0 AuthServerConfig
  */
-export function useAuthServer<
+export function defineAuthServer<
   Token extends BaseToken = BaseToken,
   UserIdentity extends BaseUserIdentity = BaseUserIdentity,
   RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,

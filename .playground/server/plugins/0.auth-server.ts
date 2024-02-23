@@ -4,12 +4,12 @@ console.log('Module Load - auth-server')
 
 import { randomUUID } from 'uncrypto';
 // import { defineUserDb, useUserDb } from '../utils/db';
-// import { useAuthServer } from '../utils/auth-core';
+// import { defineAuthServer } from '../utils/auth-core';
 
 export default defineNitroPlugin((nirtoApp) => {
   console.info('Nitro Plugin - auth-server')
 
-  useAuthServer({
+  defineAuthServer({
     // 应该按实际业务去编写 AuthenticationHook 接口的签名
     authenticationHook: async ({account, password} : {account: string, password: string}) => {
       const user = await findUserByAccount(account)

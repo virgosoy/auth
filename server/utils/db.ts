@@ -42,7 +42,7 @@ interface UserDb<
   findUserByAccount(account: UserAccountT): Promise<UserT | null>
   /**
    * 创建用户
-   * @param user 密码是否加密取决于实现，user 与前端请求后端接收的参数一致。 \ 
+   * @param user 密码是否加密取决于实现，user 与前端请求后端接收的参数一致。 \
    * 可以在前端加密后传输，也可以在后端加密。甚至双端都加密。 \
    * 如需加密可以使用 await hash(password) 生成 
    */

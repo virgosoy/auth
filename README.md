@@ -75,3 +75,32 @@ Checkout the [deployment documentation](https://nuxt.com/docs/getting-started/de
 ## 依赖说明
 
 开发依赖的 @nuxt/examples-ui 是 playground 依赖的，实际并不需要。
+
+## 使用
+
+首先依赖此层，nuxt.config.js：
+```ts
+export default defineNuxtConfig({
+  extends: [
+    // master 分支
+    'github:virgosoy/auth#master',
+  ],
+})
+```
+
+创建服务端插件，进行初始化：
+/server/plugins/0.auth-server.ts
+```ts
+export default defineNitroPlugin((nirtoApp) => {
+  defineAuthServer(...)
+  defineUserDb(...)
+})
+```
+
+定义类型，便于TS使用。后面程序中直接使用定义的方法。
+/composables/auth.ts
+```ts
+export const useMyAuthClient = useAuthClient<...>
+export const useMyUser = useUser<...>
+```
+
