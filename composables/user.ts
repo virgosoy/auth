@@ -1,8 +1,9 @@
+import type { BaseUser, BaseUserAccount, BaseUserForFrontEnd } from "../server/utils/db"
 
 
 export function useUser<
-  UserT extends Record<string, any> = Record<string, any>, 
-  UserForFrontEndT extends Record<string, any> = Record<string, any>,
+  UserT extends BaseUser = BaseUser, 
+  UserForFrontEndT extends BaseUserForFrontEnd = BaseUserForFrontEnd,
   UserAccountT extends BaseUserAccount = BaseUserAccount,
 >(){
   return {

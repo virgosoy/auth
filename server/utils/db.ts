@@ -21,14 +21,25 @@ export interface User {
 }
 
 /**
+ * 基类，用户对象
+ */
+export type BaseUser = Record<string, any>
+
+/**
+ * 基类，用户对象，用于前端显示
+ */
+export type BaseUserForFrontEnd = Record<string, any>
+
+/**
  * 用户账号
  * 和 {@link BaseUserIdentity} 类似，但不一定一致，前者方便用户输入，后者可以存储账号，也可以存储整个对象，都是可以确定用户的唯一。
  */
 export type BaseUserAccount = {}
 
+
 interface UserDb<
-  UserT extends Record<string, any> = Record<string, any>, 
-  UserForFrontEndT extends Record<string, any> = Record<string, any>,
+  UserT extends BaseUser = BaseUser, 
+  UserForFrontEndT extends BaseUserForFrontEnd = BaseUserForFrontEnd,
   UserAccountT extends BaseUserAccount = BaseUserAccount,
 > {
   /**
@@ -71,8 +82,8 @@ interface UserDb<
 let userDb: UserDb
 
 export function defineUserDb<
-  UserT extends Record<string, any> = Record<string, any>, 
-  UserForFrontEndT extends Record<string, any> = Record<string, any>,
+  UserT extends BaseUser = BaseUser, 
+  UserForFrontEndT extends BaseUserForFrontEnd = BaseUserForFrontEnd,
   UserAccountT extends BaseUserAccount = BaseUserAccount,
 >(userDb_: UserDb<UserT, UserForFrontEndT, UserAccountT>){
   userDb = userDb_
