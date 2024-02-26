@@ -69,12 +69,19 @@ interface UserDb<
 
 let userDb: UserDb
 
+/**
+ * 定义 user 数据库操作 \
+ * 方便类型定义，并方便其他方法调用参数中的方法。
+ * @param userDb_ -
+ * @returns 会直接返回参数，方便外部使用，外部可直接使用这些函数。
+ */
 export function defineUserDb<
   UserT extends BaseUser = BaseUser, 
   UserForFrontEndT extends BaseUserForFrontEnd = BaseUserForFrontEnd,
   UserAccountT extends BaseUserAccount = BaseUserAccount,
 >(userDb_: UserDb<UserT, UserForFrontEndT, UserAccountT>){
   userDb = userDb_
+  return userDb_
 }
 
 /**
