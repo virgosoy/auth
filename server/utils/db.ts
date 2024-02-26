@@ -56,7 +56,8 @@ interface UserDb<
    * 更新用户，以什么做主键取决于实现，但一般建议 id 做主键。
    * @param updates 用户对象，密码是否经过加密取决于实现。\
    * 此对象与前端请求后端参数一致。 \
-   * 如需加密，可以使用 await hash(password) 生成 
+   * 如需加密，可以使用 await hash(password) 生成 \
+   * 实现注意：即使对象值是 undefined，也会被对象扩展覆盖，所以要注意密码的传递。
    */
   updateUser(updates: Partial<UserT>): Promise<void>
   /**
