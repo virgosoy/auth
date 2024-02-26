@@ -100,7 +100,7 @@ export default defineNitroPlugin((nirtoApp) => {
 定义类型，便于TS使用。后面程序中直接使用定义的方法。
 /composables/auth.ts
 ```ts
-export const useMyAuthClient = useAuthClient<...>
-export const useMyUser = useUser<...>
+export const useMyAuthClient = useAuthClient_<...>
+export const useMyUser = useUser_<...>
 ```
 

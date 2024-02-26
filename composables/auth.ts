@@ -6,7 +6,7 @@ console.log('Load Module - composables/auth.ts')
  * 内部使用，用于服务端登录后刷新客户端 session 和重定向
  */
 async function _postLogin(){
-  const { $auth } = useAuthClient()
+  const { $auth } = useAuthClient_()
   $auth.redirectTo.value = null;
   await $auth.refreshSession();
   await navigateTo($auth.redirectTo.value || "/");
@@ -32,7 +32,7 @@ async function logout() {
   await $fetch("/api/auth/logout", {
     method: "POST",
   });
-  const { $auth } = useAuthClient()
+  const { $auth } = useAuthClient_()
   await $auth.refreshSession();
 }
 
@@ -57,14 +57,14 @@ async function changeCredential<ChangeCredentialInfo extends BaseChangeCredentia
     method: "POST",
     body: changeCredentialInfo,
   })
-  const { $auth } = useAuthClient()
+  const { $auth } = useAuthClient_()
   await $auth.refreshSession();
 }
 
 /**
  * 使用 auth 客户端
  */
-export function useAuthClient<
+export function useAuthClient_<
   Token extends BaseToken = BaseToken, 
   UserIdentity extends BaseUserIdentity = BaseUserIdentity,
   RegistrationInfo extends BaseRegistrationInfo = BaseRegistrationInfo,

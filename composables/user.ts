@@ -1,7 +1,7 @@
 import type { BaseUser, BaseUserAccount, BaseUserForFrontEnd } from "../server/utils/db"
 
 
-export function useUser<
+export function useUser_<
   UserT extends BaseUser = BaseUser, 
   UserForFrontEndT extends BaseUserForFrontEnd = BaseUserForFrontEnd,
   UserAccountT extends BaseUserAccount = BaseUserAccount,

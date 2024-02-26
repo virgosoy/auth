@@ -1,6 +1,6 @@
 import type { AuthSession } from "../server/utils/session";
 
-console.info('Load Module - auth')
+console.info('Load Module - plugins/0.auth')
 
 export default defineNuxtPlugin(async (nuxtApp) => {
   console.info('Nuxt Plugin - auth')
