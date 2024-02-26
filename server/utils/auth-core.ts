@@ -44,14 +44,15 @@ interface AuthenticationHook<
 /**
  * 授权
  */
-interface AuthorizationHook {
+interface AuthorizationHook<UserIdentity extends BaseUserIdentity = BaseUserIdentity> {
   /**
    * 授权
    * @param arg.event H3Event
+   * @param arg.user session 中的 user 数据，即 UserIdentity
    * @param arg.permKey 要判断的权限 key
    * @returns 是否有权限
    */
-  (arg: {event: H3Event, permKey: string}): Promise<boolean>
+  (arg: {event: H3Event, user: UserIdentity, permKey: string}): Promise<boolean>
 }
 
 interface AuthServerConfig<
@@ -67,7 +68,7 @@ interface AuthServerConfig<
   /**
    * 授权
    */
-  authorizationHook: AuthorizationHook,
+  authorizationHook: AuthorizationHook<UserIdentity>,
   /**
    * 注册，和 {@link createUser} 类似，但是是面向用户的 \
    * 非必须，因为并不是所有业务都需要在此系统注册
