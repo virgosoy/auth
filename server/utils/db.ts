@@ -6,19 +6,6 @@ import type { Storage, StorageValue } from 'unstorage'
 /** 重写 useStorage 给予默认 key */
 // const useStorage = <T extends StorageValue>(): Storage<T> => _useStorage<T>('auth')
 
-/**
- * 用户
- */
-export interface User {
-  id: string;
-  createdAt: string;
-  name: string;
-  account: string;
-  /**
-   * 加密后的，用 await hash(password) 加密
-   */
-  password: string;
-}
 
 /**
  * 基类，用户对象

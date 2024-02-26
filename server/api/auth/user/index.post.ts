@@ -1,3 +1,4 @@
+import type { User } from "~/server/plugins/0.auth-server"
 import { useUserDb } from "../../../utils/db"
 
 /**

@@ -6,6 +6,20 @@ import { randomUUID } from 'uncrypto';
 // import { defineUserDb, useUserDb } from '../utils/db';
 // import { defineAuthServer } from '../utils/auth-core';
 
+/**
+ * 用户
+ */
+export interface User {
+  id: string;
+  createdAt: string;
+  name: string;
+  account: string;
+  /**
+   * 加密后的，用 await hash(password) 加密
+   */
+  password: string;
+}
+
 export default defineNitroPlugin((nirtoApp) => {
   console.info('Nitro Plugin - auth-server')
 

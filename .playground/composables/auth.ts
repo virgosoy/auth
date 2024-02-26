@@ -1,4 +1,4 @@
-import type { User } from "../../server/utils/db"
+import type { User } from "~/server/plugins/0.auth-server"
 
 
 /**

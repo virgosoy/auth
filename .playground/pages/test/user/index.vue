@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { User } from '../../../../server/utils/db';
+import type { User } from '~/server/plugins/0.auth-server';
 
 const accounts = ref<Omit<User, 'password'>[]>([])
 async function listUser() {
