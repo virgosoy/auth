@@ -33,7 +33,7 @@ export function useUser_<
      * @param user 
      */
     async createUser(user: Partial<UserT>) {
-      const res = await $fetch('/api/auth/user/add', { 
+      const res = await $fetch('/api/auth/user', { 
         method: 'POST',
         body: user,
       })
