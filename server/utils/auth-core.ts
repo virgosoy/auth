@@ -48,11 +48,11 @@ interface AuthorizationHook<UserIdentity extends BaseUserIdentity = BaseUserIden
   /**
    * 授权
    * @param arg.event H3Event
-   * @param arg.user session 中的 user 数据，即 UserIdentity
+   * @param arg.user session 中的 user 数据，即 UserIdentity，未认证则为 undefined。
    * @param arg.permKey 要判断的权限 key
    * @returns 是否有权限
    */
-  (arg: {event: H3Event, user: UserIdentity, permKey: string}): Promise<boolean>
+  (arg: {event: H3Event, user?: UserIdentity, permKey: string}): Promise<boolean>
 }
 
 interface AuthServerConfig<
@@ -166,8 +166,10 @@ export function defineAuthServer<
    * @param permKey 
    */
   async function hasAuth(event: H3Event, permKey: string) {
+    const session = await useAuthSession<UserIdentity>(event)
+    const user = session.data.user
     const result = 
-        await (authorizationHook ?? throw500Error(event, 'authorization hook is not registered'))({event, permKey})
+        await (authorizationHook ?? throw500Error(event, 'authorization hook is not registered'))({event, user, permKey})
     return result
   }
 
